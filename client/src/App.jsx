@@ -12,23 +12,23 @@ import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 
 export default function App() {
-  return (
-    <Routes>
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Route>
+    return (
+        <Routes>
+            <Route element={<AuthLayout />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+            </Route>
 
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Navigate to="/feed" replace />} />
-        <Route path="/feed" element={<Feed />} />
-        <Route path="/discover" element={<Discovery />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/connections" element={<Connections />} />
-        <Route path="/settings" element={<Settings />} />
-      </Route>
+            <Route element={<MainLayout />}>
+                <Route path="/" element={<Navigate to="/feed" replace />} />
+                <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+                <Route path="/discover" element={<ProtectedRoute><Discovery /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            </Route>
 
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  )
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    )
 }
