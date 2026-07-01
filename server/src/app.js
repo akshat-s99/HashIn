@@ -25,6 +25,7 @@ app.use(cookieParser());
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import discoverRoutes from './routes/discover.routes.js';
+import postRoutes from './routes/post.routes.js';
 
 // Health Check Route
 app.get('/api/health', (req, res) => {
@@ -35,8 +36,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/discover', discoverRoutes);
+app.use('/api/posts', postRoutes);
 // app.use('/api/connections', connectionRoutes);
-// app.use('/api/posts', postRoutes);
 
 // Unhandled Routes
 app.all('*', (req, res, next) => {
