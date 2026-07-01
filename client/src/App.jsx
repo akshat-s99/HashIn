@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import Feed from './pages/Feed'
 import Discovery from './pages/DiscoveryPage'
 import Profile from './pages/ProfilePage'
+import Network from './pages/NetworkPage'
 import Connections from './pages/Connections'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
@@ -24,7 +25,9 @@ export default function App() {
                 <Route path="/" element={<Navigate to="/feed" replace />} />
                 <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
                 <Route path="/discover" element={<ProtectedRoute><Discovery /></ProtectedRoute>} />
+                <Route path="/network" element={<ProtectedRoute><Network /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             </Route>
