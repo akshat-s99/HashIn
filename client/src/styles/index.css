@@ -94,3 +94,8 @@ html,body,#root {
   border-radius: 6px;
   background: rgba(255,255,255,0.03);
 }
+
+.like-animate{
+  transform: scale(1.05);
+  transition: transform 120ms ease-in-out;
+}
