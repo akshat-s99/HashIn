@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import api from '../api/axios'
 import Card from '../components/Card'
 import Button from '../components/Button'
@@ -8,19 +9,43 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
 
+  const params = useParams()
+
   useEffect(() => {
     async function load() {
-      const res = await api.get('/users/me')
-      setProfile(res.data)
-      setForm(res.data)
+      try {
+        if (params.userId) {
+          const res = await api.get(`/users/${params.userId}`)
+          setProfile(res.data)
+          setForm(res.data)
+          setEditing(false)
+        } else {
+          const res = await api.get('/users/me')
+          setProfile(res.data)
+          setForm(res.data)
+        }
+      } catch (e) {
+        console.error(e)
+      }
     }
     load()
-  }, [])
+  }, [params.userId])
 
   async function save() {
     const res = await api.put('/users/me', form)
     setProfile(res.data)
     setEditing(false)
+  }
+
+  async function sendConnectionRequest() {
+    if (!params.userId) return
+    try {
+      await api.post(`/connections/request/${params.userId}`)
+      alert('Connection request sent')
+    } catch (e) {
+      console.error(e)
+      alert('Failed to send request')
+    }
   }
 
   if (!profile) return <div>Loading...</div>
@@ -46,7 +71,11 @@ export default function ProfilePage() {
                 <span key={s} className="me-2 badge bg-light text-dark skill-tag">{s}</span>
               ))}
             </div>
-            <Button onClick={() => setEditing(true)}>Edit profile</Button>
+            {!params.userId ? (
+              <Button onClick={() => setEditing(true)}>Edit profile</Button>
+            ) : (
+              <Button onClick={sendConnectionRequest}>Connect</Button>
+            )}
           </>
         ) : (
           <>
