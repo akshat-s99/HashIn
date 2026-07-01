@@ -22,13 +22,15 @@ app.use('/api', apiLimiter);
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 
+import authRoutes from './routes/auth.routes.js';
+
 // Health Check Route
 app.get('/api/health', (req, res) => {
   sendSuccess(res, HTTP_STATUS.OK, null, 'HashIn API is running');
 });
 
-// Main Routes (To be added in Sprint 2)
-// app.use('/api/auth', authRoutes);
+// Main Routes
+app.use('/api/auth', authRoutes);
 // app.use('/api/users', userRoutes);
 // app.use('/api/connections', connectionRoutes);
 // app.use('/api/posts', postRoutes);
