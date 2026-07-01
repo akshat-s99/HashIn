@@ -23,6 +23,8 @@ app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 
 import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import discoverRoutes from './routes/discover.routes.js';
 
 // Health Check Route
 app.get('/api/health', (req, res) => {
@@ -31,10 +33,10 @@ app.get('/api/health', (req, res) => {
 
 // Main Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/discover', discoverRoutes);
 // app.use('/api/connections', connectionRoutes);
 // app.use('/api/posts', postRoutes);
-// app.use('/api/discover', discoverRoutes);
 
 // Unhandled Routes
 app.all('*', (req, res, next) => {
