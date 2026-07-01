@@ -10,6 +10,7 @@ import Profile from './pages/Profile'
 import Connections from './pages/Connections'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
+import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
     return (
