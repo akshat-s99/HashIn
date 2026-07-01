@@ -86,3 +86,11 @@ html,body,#root {
   animation: shimmer 1.2s infinite;
 }
 @keyframes shimmer { 0% { background-position:-200px 0 } 100% { background-position:200px 0 } }
+
+.skill-tag{
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.03);
+}
