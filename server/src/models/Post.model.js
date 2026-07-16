@@ -13,6 +13,10 @@ const postSchema = new mongoose.Schema(
       trim: true,
       maxLength: 500, // Text-only posts constraint for P0
     },
+    mediaUrl: {
+      type: String,
+      default: '',
+    },
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -46,5 +50,6 @@ const postSchema = new mongoose.Schema(
 
 // Index for getting feed sorted by newest
 postSchema.index({ createdAt: -1 });
+postSchema.index({ authorId: 1, createdAt: -1 });
 
 export const Post = mongoose.model('Post', postSchema);

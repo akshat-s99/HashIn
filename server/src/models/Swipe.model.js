@@ -26,5 +26,7 @@ const swipeSchema = new mongoose.Schema(
 
 // A user can only swipe another user once
 swipeSchema.index({ swiperId: 1, swipedId: 1 }, { unique: true });
+swipeSchema.index({ swiperId: 1 });
+swipeSchema.index({ swipedId: 1, action: 1 });
 
 export const Swipe = mongoose.model('Swipe', swipeSchema);

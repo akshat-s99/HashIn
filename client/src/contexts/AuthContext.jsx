@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import api from '../api/axios'
+import api, { setAccessToken } from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 
 const AuthContext = createContext()
@@ -14,27 +14,37 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Try to refresh session on app start
-    async function refresh() {
+    // On app load, attempt a silent refresh to rehydrate the access token
+    // from the httpOnly refresh token cookie (sent automatically)
+    async function silentRefresh() {
       try {
         const res = await api.post('/auth/refresh')
-        // backend may return user data
-        if (res?.data?.user) setUser(res.data.user)
+        const data = res?.data?.data
+        if (data?.accessToken) {
+          setAccessToken(data.accessToken)
+        }
+        const u = data?.user
+        if (u) setUser(u)
       } catch (err) {
+        // No valid refresh cookie — user is not logged in
         setUser(null)
+        setAccessToken(null)
       } finally {
         setIsLoading(false)
       }
     }
-    refresh()
+    silentRefresh()
   }, [])
 
   async function login(credentials) {
     setIsLoading(true)
     try {
       const res = await api.post('/auth/login', credentials)
-      // assume backend returns user in response
-      const u = res?.data?.user ?? res?.data
+      const data = res?.data?.data
+      if (data?.accessToken) {
+        setAccessToken(data.accessToken)
+      }
+      const u = data?.user
       setUser(u)
       return u
     } finally {
@@ -46,7 +56,11 @@ export function AuthProvider({ children }) {
     setIsLoading(true)
     try {
       const res = await api.post('/auth/register', payload)
-      const u = res?.data?.user ?? res?.data
+      const data = res?.data?.data
+      if (data?.accessToken) {
+        setAccessToken(data.accessToken)
+      }
+      const u = data?.user
       setUser(u)
       return u
     } finally {
@@ -59,15 +73,16 @@ export function AuthProvider({ children }) {
     try {
       await api.post('/auth/logout')
     } catch (err) {
-      // ignore
+      // ignore — cookie may already be cleared
     } finally {
       setUser(null)
+      setAccessToken(null)
       setIsLoading(false)
       navigate('/login')
     }
   }
 
-  const value = { user, isLoading, login, register, logout }
+  const value = { user, setUser, isLoading, login, register, logout }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

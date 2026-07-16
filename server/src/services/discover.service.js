@@ -99,8 +99,60 @@ export const swipeUser = async (swiperId, swipedId, action) => {
         },
         { upsert: true }
       );
+      // --- SIMULATED CHAT ENGINE UPGRADE ---
+      setTimeout(async () => {
+        try {
+          const { getIo } = await import('../socket.js');
+          const messageService = await import('./message.service.js');
+          
+          const swiper = await User.findById(swiperId);
+          if (!swiper) return;
+
+          const welcomeMsg = getSimulatedWelcomeMessage(swipedUser, swiper);
+          const { message, conversation } = await messageService.sendMessage(swipedId, swiperId, welcomeMsg);
+
+          const io = getIo();
+          if (io) {
+            io.to(swiperId.toString()).emit('receive_message', {
+              message,
+              conversationId: conversation._id,
+            });
+          }
+        } catch (err) {
+          console.error('Simulated match message failure:', err);
+        }
+      }, 4000);
+    } else {
+      // Create a pending connection request
+      await Connection.findOneAndUpdate(
+        { 
+          $or: [
+            { senderId: swiperId, receiverId: swipedId },
+            { senderId: swipedId, receiverId: swiperId }
+          ]
+        },
+        { 
+          senderId: swiperId,
+          receiverId: swipedId,
+          status: CONNECTION_STATUS.PENDING 
+        },
+        { upsert: true }
+      );
     }
   }
 
   return { isMatch };
+};
+
+const getSimulatedWelcomeMessage = (mockUser, realUser) => {
+  const commonSkills = (mockUser.skills || []).filter(s => (realUser.skills || []).includes(s));
+  const skillMention = commonSkills.length > 0 ? commonSkills[0] : null;
+
+  const messages = [
+    `Hey ${realUser.firstName}! Nice matching with you. I saw you write ${skillMention || 'some great stuff'} too! What are you building right now?`,
+    `Hi ${realUser.firstName}, saw your profile and loved your focus on ${skillMention || 'modern dev stacks'}. Let's connect!`,
+    `Hey there! Always great to meet another developer working with ${skillMention || 'systems architecture'}. How long have you been engineering?`,
+    `What's up! Saw your background. I'm actually looking for collaborators for a side-project. Are you currently looking for new projects?`
+  ];
+  return messages[Math.floor(Math.random() * messages.length)];
 };

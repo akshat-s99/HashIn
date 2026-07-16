@@ -26,5 +26,7 @@ const connectionSchema = new mongoose.Schema(
 
 // Prevent duplicate connection requests in any direction
 connectionSchema.index({ senderId: 1, receiverId: 1 }, { unique: true });
+connectionSchema.index({ senderId: 1, status: 1 });
+connectionSchema.index({ receiverId: 1, status: 1 });
 
 export const Connection = mongoose.model('Connection', connectionSchema);

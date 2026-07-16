@@ -65,7 +65,7 @@ const userSchema = new Schema({
     maxlength: 120,
     default: ''
   },
-  bio: {
+  about: {
     type: String,
     maxlength: 500,
     default: ''

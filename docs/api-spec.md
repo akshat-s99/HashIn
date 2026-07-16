@@ -145,7 +145,7 @@ Get the authenticated user's profile.
     "lastName": "Doe",
     "email": "john@example.com",
     "headline": "Full Stack Developer",
-    "bio": "...",
+    "about": "...",
     "skills": ["React", "Node.js", "MongoDB"],
     "location": "Mumbai, India",
     "githubUrl": "https://github.com/johndoe",
@@ -169,7 +169,7 @@ Update the authenticated user's profile.
 | firstName | string | ❌ | 2–50 chars |
 | lastName | string | ❌ | 2–50 chars |
 | headline | string | ❌ | Max 120 chars |
-| bio | string | ❌ | Max 500 chars |
+| about | string | ❌ | Max 500 chars |
 | skills | string[] | ❌ | 1–15 items, each 1–30 chars |
 | location | string | ❌ | Max 100 chars |
 | githubUrl | string | ❌ | Valid URL |

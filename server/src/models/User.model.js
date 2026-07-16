@@ -58,27 +58,58 @@ const userSchema = new mongoose.Schema(
       linkedin: { type: String, default: '' },
       portfolio: { type: String, default: '' },
     },
+    experience: [{
+      title: String,
+      company: String,
+      startDate: String,
+      endDate: String,
+      current: { type: Boolean, default: false },
+      description: String
+    }],
+    education: [{
+      school: String,
+      degree: String,
+      fieldOfStudy: String,
+      startDate: String,
+      endDate: String
+    }],
     avatar: {
       type: String,
       default: '',
     },
+    refreshTokens: {
+      type: [{
+        token: String,
+        createdAt: { type: Date, default: Date.now },
+        expiresAt: Date,
+        userAgent: String
+      }],
+      select: false, // Never exposed in queries by default
+    },
+    bookmarks: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    }],
+    isDisabled: {
+      type: Boolean,
+      default: false
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   {
     timestamps: true,
   }
 );
 
-// Hash password before saving
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+userSchema.index({ firstName: 'text', lastName: 'text', headline: 'text', about: 'text' });
 
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+// Hash password before saving
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Method to check password

@@ -4,7 +4,8 @@ import { HTTP_STATUS } from '../config/constants.js';
 
 export const createPost = async (req, res, next) => {
   try {
-    const post = await postService.createPost(req.user._id, req.body.content);
+    const mediaUrl = req.file ? req.file.path : undefined;
+    const post = await postService.createPost(req.user._id, req.body.content, mediaUrl);
     sendSuccess(res, HTTP_STATUS.CREATED, { post }, 'Post created successfully');
   } catch (error) {
     next(error);
@@ -32,6 +33,15 @@ export const getPost = async (req, res, next) => {
   }
 };
 
+export const deletePost = async (req, res, next) => {
+  try {
+    await postService.deletePost(req.user._id, req.params.id);
+    sendSuccess(res, HTTP_STATUS.OK, null, 'Post deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const toggleLike = async (req, res, next) => {
   try {
     const post = await postService.toggleLike(req.user._id, req.params.id);
@@ -45,6 +55,24 @@ export const addComment = async (req, res, next) => {
   try {
     const comment = await postService.addComment(req.user._id, req.params.id, req.body.content);
     sendSuccess(res, HTTP_STATUS.CREATED, { comment }, 'Comment added successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const toggleBookmark = async (req, res, next) => {
+  try {
+    const isBookmarked = await postService.toggleBookmark(req.user._id, req.params.id);
+    sendSuccess(res, HTTP_STATUS.OK, { isBookmarked }, isBookmarked ? 'Post saved' : 'Post unsaved');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getBookmarkedPosts = async (req, res, next) => {
+  try {
+    const posts = await postService.getBookmarkedPosts(req.user._id);
+    sendSuccess(res, HTTP_STATUS.OK, { posts });
   } catch (error) {
     next(error);
   }

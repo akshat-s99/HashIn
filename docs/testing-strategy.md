@@ -194,7 +194,7 @@ Rate Limiter
 | # | Flow | Steps |
 |---|---|---|
 | 1 | **Registration → Login** | Register with valid data → Receive tokens → Access protected route |
-| 2 | **Profile Setup** | Login → Update headline, bio, skills → Verify profile displays |
+| 2 | **Profile Setup** | Login → Update headline, about, skills → Verify profile displays |
 | 3 | **Discovery & Match** | User A and B both add overlapping skills → A discovers B → A swipes right → B discovers A → B swipes right → Match notification → Connection created |
 | 4 | **Connection Management** | View pending requests → Accept request → View in connections list → Remove connection |
 | 5 | **Content Feed** | Create post → Post appears in own feed → Connected user sees post in their feed → Like/unlike post |

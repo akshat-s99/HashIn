@@ -10,10 +10,12 @@ export const validate = (schema) => (req, res, next) => {
     });
     next();
   } catch (err) {
-    const errors = err.errors.map((e) => ({
+    const zodErrors = err.issues || err.errors || [];
+    const errors = zodErrors.map((e) => ({
       path: e.path.join('.'),
       message: e.message,
     }));
-    return sendError(res, HTTP_STATUS.BAD_REQUEST, 'Validation failed', errors);
+    const message = zodErrors.map((e) => e.message).join(', ') || 'Validation failed';
+    return sendError(res, HTTP_STATUS.BAD_REQUEST, message, errors);
   }
 };

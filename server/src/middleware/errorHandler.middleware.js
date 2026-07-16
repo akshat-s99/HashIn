@@ -15,6 +15,23 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
 
+  // Mongoose CastError (invalid ObjectId)
+  if (err.name === 'CastError') {
+    return sendError(res, HTTP_STATUS.BAD_REQUEST, 'Invalid ID format');
+  }
+
+  // MongoDB duplicate key error
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyValue || {}).join(', ');
+    return sendError(res, 409, `Duplicate field value: ${field}`);
+  }
+
+  // Mongoose ValidationError
+  if (err.name === 'ValidationError') {
+    const messages = Object.values(err.errors).map((e) => e.message);
+    return sendError(res, HTTP_STATUS.BAD_REQUEST, messages.join('. '));
+  }
+
   // Production error formatting
   if (err.isOperational) {
     return sendError(res, err.statusCode, err.message);

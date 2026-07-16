@@ -44,3 +44,11 @@ export const protect = async (req, res, next) => {
     );
   }
 };
+
+export const requireAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    next(new AppError('Not authorized as an admin', HTTP_STATUS.FORBIDDEN));
+  }
+};

@@ -23,10 +23,10 @@ export const sendConnectionRequest = async (senderId, receiverId) => {
 
   if (existingConnection) {
     if (existingConnection.status === CONNECTION_STATUS.ACCEPTED) {
-      throw new AppError('You are already connected with this user', HTTP_STATUS.BAD_REQUEST);
+      throw new AppError('You are already connected with this user', 409);
     }
     if (existingConnection.status === CONNECTION_STATUS.PENDING) {
-      throw new AppError('A connection request is already pending', HTTP_STATUS.BAD_REQUEST);
+      throw new AppError('A connection request is already pending', 409);
     }
   }
 

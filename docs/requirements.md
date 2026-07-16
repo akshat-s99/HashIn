@@ -63,7 +63,7 @@ HashIn is a full-stack web application (MERN) targeting developers seeking profe
 | ID | Requirement | Priority |
 |---|---|---|
 | PROF-01 | Users can view their own profile | P0 |
-| PROF-02 | Users can update profile fields (headline, bio, skills, links) | P0 |
+| PROF-02 | Users can update profile fields (headline, about, skills, links) | P0 |
 | PROF-03 | Users can view other users' public profiles | P0 |
 | PROF-04 | Skills are stored as an array of strings | P0 |
 | PROF-05 | Profile includes optional GitHub, LinkedIn, and portfolio URLs | P0 |

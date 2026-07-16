@@ -5,10 +5,8 @@ import Navbar from '../components/Navbar'
 export default function MainLayout() {
   return (
     <>
-      <div className="container py-3">
-        <Navbar />
-      </div>
-      <div className="app-container">
+      <Navbar />
+      <div className="container mt-4 mb-5" style={{ maxWidth: '1128px' }}>
         <Outlet />
       </div>
     </>

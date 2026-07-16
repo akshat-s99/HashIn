@@ -151,7 +151,7 @@ HashIn/
 │   └── /forgot-password    → Password Reset (P1)
 │
 ├── ONBOARDING (auth required, incomplete profile)
-│   └── /onboarding         → Profile Setup Wizard (skills, bio, links)
+│   └── /onboarding         → Profile Setup Wizard (skills, about, links)
 │
 ├── CORE APP (auth required, profile complete)
 │   ├── /                   → Home / Feed Page
