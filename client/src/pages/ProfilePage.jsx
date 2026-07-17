@@ -96,29 +96,30 @@ export default function ProfilePage() {
 
   if (editing) {
     return (
-      <div className="w-full max-w-3xl mx-auto py-lg px-margin-mobile">
-        <div className="glass-panel rounded-xl p-md border border-white/10">
-          <h3 className="font-headline-md font-bold text-on-surface mb-xl">Edit Profile</h3>
+      <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto', padding: '32px 16px' }}>
+        <div className="card-minimal" style={{ padding: '32px' }}>
+          <h3 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-text-main)', marginBottom: '32px' }}>Edit Profile</h3>
           
-          <div className="flex flex-col md:flex-row items-center gap-md mb-xl pb-md border-b border-white/10">
-            <div className="relative">
-              <div className="w-[100px] h-[100px] rounded-full bg-surface-container border-4 border-background overflow-hidden">
-                <img src={form.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${form._id}`} className="w-full h-full object-cover" />
+          <div className="d-flex flex-column flex-md-row align-items-center gap-4 mb-4 pb-4" style={{ borderBottom: '1px solid var(--color-border)' }}>
+            <div style={{ position: 'relative' }}>
+              <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: 'var(--bg-nav)', border: '4px solid var(--bg-card)', overflow: 'hidden' }}>
+                <img src={form.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${form._id}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Avatar" />
               </div>
-              <input type="file" ref={fileInputRef} onChange={handleAvatarUpload} accept="image/*" className="hidden" />
+              <input type="file" ref={fileInputRef} onChange={handleAvatarUpload} accept="image/*" style={{ display: 'none' }} />
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary border-2 border-background text-on-primary flex items-center justify-center disabled:opacity-50"
+                style={{ position: 'absolute', bottom: 0, right: 0, width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', border: '2px solid var(--bg-card)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}
                 disabled={uploadingAvatar}
               >
                 {uploadingAvatar ? '...' : <CiCamera size={16} />}
               </button>
             </div>
             <div>
-              <h5 className="font-body-lg font-bold text-on-surface mb-1">Profile Photo</h5>
-              <p className="font-body-sm text-on-surface-variant mb-3">Upload a professional headshot.</p>
+              <h5 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-main)', margin: '0 0 4px 0' }}>Profile Photo</h5>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-muted)', margin: '0 0 12px 0' }}>Upload a professional headshot.</p>
               <button 
-                className="flex items-center gap-xs px-4 py-1.5 rounded-full border border-white/10 text-on-surface text-[13px] hover:bg-white/5 transition-colors"
+                className="btn-action-minimal d-flex align-items-center gap-2"
+                style={{ padding: '6px 16px', borderRadius: 'var(--radius-pill)', border: '1px solid var(--color-border)', fontSize: '13px' }}
                 onClick={() => {
                   const seed = encodeURIComponent((form.firstName || 'User') + Math.random().toString(36).substring(7));
                   const newAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${seed}`;
@@ -130,52 +131,52 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-md mb-lg">
-            <div className="flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">First Name</label>
-              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.firstName || ''} onChange={e => setForm({...form, firstName: e.target.value})} />
+          <div className="row g-3 mb-4">
+            <div className="col-12 col-md-6 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>First Name</label>
+              <input className="form-control" style={{ height: '40px', backgroundColor: 'var(--bg-body)' }} value={form.firstName || ''} onChange={e => setForm({...form, firstName: e.target.value})} />
             </div>
-            <div className="flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">Last Name</label>
-              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.lastName || ''} onChange={e => setForm({...form, lastName: e.target.value})} />
+            <div className="col-12 col-md-6 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Last Name</label>
+              <input className="form-control" style={{ height: '40px', backgroundColor: 'var(--bg-body)' }} value={form.lastName || ''} onChange={e => setForm({...form, lastName: e.target.value})} />
             </div>
-            <div className="md:col-span-2 flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">Headline</label>
-              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.headline || ''} onChange={e => setForm({...form, headline: e.target.value})} placeholder="Software Engineer @ HashIn" />
+            <div className="col-12 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Headline</label>
+              <input className="form-control" style={{ height: '40px', backgroundColor: 'var(--bg-body)' }} value={form.headline || ''} onChange={e => setForm({...form, headline: e.target.value})} placeholder="Software Engineer @ HashIn" />
             </div>
-            <div className="md:col-span-2 flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">Location</label>
-              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.location || ''} onChange={e => setForm({...form, location: e.target.value})} placeholder="San Francisco, CA" />
+            <div className="col-12 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Location</label>
+              <input className="form-control" style={{ height: '40px', backgroundColor: 'var(--bg-body)' }} value={form.location || ''} onChange={e => setForm({...form, location: e.target.value})} placeholder="San Francisco, CA" />
             </div>
-            <div className="md:col-span-2 flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">About</label>
-              <textarea className="w-full p-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none h-24 resize-none" value={form.about || ''} onChange={e => setForm({...form, about: e.target.value})} placeholder="Tell us about yourself..." />
+            <div className="col-12 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>About</label>
+              <textarea className="form-control" style={{ minHeight: '96px', resize: 'vertical', backgroundColor: 'var(--bg-body)' }} value={form.about || ''} onChange={e => setForm({...form, about: e.target.value})} placeholder="Tell us about yourself..." />
             </div>
-            <div className="md:col-span-2 flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">Skills (comma separated)</label>
-              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={Array.isArray(form.skills) ? form.skills.join(', ') : (form.skills || '')} onChange={e => setForm({...form, skills: e.target.value})} placeholder="React, Node.js, Go" />
-            </div>
-          </div>
-          
-          <h4 className="font-headline-sm font-bold text-on-surface mb-md">Social Links</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-md mb-xl">
-            <div className="flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">GitHub</label>
-              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.links?.github || ''} onChange={e => handleLinkChange(e, 'github')} />
-            </div>
-            <div className="flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">LinkedIn</label>
-              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.links?.linkedin || ''} onChange={e => handleLinkChange(e, 'linkedin')} />
-            </div>
-            <div className="flex flex-col gap-xs">
-              <label className="font-label-mono text-on-surface-variant">Portfolio</label>
-              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.links?.portfolio || ''} onChange={e => handleLinkChange(e, 'portfolio')} />
+            <div className="col-12 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Skills (comma separated)</label>
+              <input className="form-control" style={{ height: '40px', backgroundColor: 'var(--bg-body)' }} value={Array.isArray(form.skills) ? form.skills.join(', ') : (form.skills || '')} onChange={e => setForm({...form, skills: e.target.value})} placeholder="React, Node.js, Go" />
             </div>
           </div>
           
-          <div className="flex justify-end gap-sm pt-md border-t border-white/10">
-            <button className="px-6 py-2 rounded-full border border-white/10 hover:bg-white/5 text-on-surface transition-colors font-bold" onClick={() => setEditing(false)}>Cancel</button>
-            <button className="px-6 py-2 rounded-full bg-primary-container text-on-primary-container hover:bg-primary transition-colors font-bold" onClick={save}>Save Changes</button>
+          <h4 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-main)', marginBottom: '16px' }}>Social Links</h4>
+          <div className="row g-3 mb-4">
+            <div className="col-12 col-md-6 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>GitHub</label>
+              <input className="form-control" style={{ height: '40px', backgroundColor: 'var(--bg-body)' }} value={form.links?.github || ''} onChange={e => handleLinkChange(e, 'github')} />
+            </div>
+            <div className="col-12 col-md-6 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>LinkedIn</label>
+              <input className="form-control" style={{ height: '40px', backgroundColor: 'var(--bg-body)' }} value={form.links?.linkedin || ''} onChange={e => handleLinkChange(e, 'linkedin')} />
+            </div>
+            <div className="col-12 col-md-6 d-flex flex-column gap-2">
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Portfolio</label>
+              <input className="form-control" style={{ height: '40px', backgroundColor: 'var(--bg-body)' }} value={form.links?.portfolio || ''} onChange={e => handleLinkChange(e, 'portfolio')} />
+            </div>
+          </div>
+          
+          <div className="d-flex justify-content-end gap-3 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+            <button className="btn-h-outline" onClick={() => setEditing(false)}>Cancel</button>
+            <button className="btn-h-primary" onClick={save}>Save Changes</button>
           </div>
         </div>
       </div>
@@ -187,59 +188,54 @@ export default function ProfilePage() {
   return (
     <div className="w-full">
       {/* Profile Header Section */}
-      <div className="relative w-full">
-        {/* Banner Gradient */}
-        <div className="h-[200px] w-full bg-gradient-to-r from-surface-container-high via-surface-container to-surface-container-high border-b border-white/5 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, #dc143c 0%, transparent 50%), radial-gradient(circle at 80% 30%, #414a53 0%, transparent 40%)'}}></div>
-          <div className="absolute inset-0" style={{backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
-        </div>
+      <div className="card-minimal" style={{ padding: 0, overflow: 'hidden', borderBottom: 'none' }}>
+        {/* Banner */}
+        <div className="profile-banner"></div>
         
         {/* Profile Info Container */}
-        <div className="max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop relative">
+        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px', position: 'relative' }}>
           {/* Avatar (Overlapping) */}
-          <div className="absolute -top-16 left-margin-mobile md:left-margin-desktop">
-            <div className="w-[130px] h-[130px] rounded-full bg-surface border-4 border-background flex items-center justify-center relative overflow-hidden">
-              <img src={profile.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${profile._id}`} alt="avatar" className="w-full h-full object-cover bg-surface-container-high" />
-              {/* Status indicator */}
-              <div className="absolute bottom-2 right-2 w-4 h-4 bg-tertiary rounded-full border-2 border-background"></div>
-            </div>
-          </div>
+          <img src={profile.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${profile._id}`} alt="avatar" className="profile-avatar" />
           
           {/* Header Actions & Info */}
-          <div className="pt-20 pb-lg flex flex-col md:flex-row md:justify-between md:items-start gap-md border-b border-white/10">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-start" style={{ padding: '24px 0', borderBottom: '1px solid var(--color-border)' }}>
             <div>
-              <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-1">{profile.firstName} {profile.lastName}</h1>
-              <p className="font-body-lg text-body-lg text-on-surface-variant mb-2">{profile.headline || 'No headline provided'}</p>
-              <div className="flex items-center gap-xs text-on-surface-variant font-label-mono text-label-mono mb-4">
+              <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-text-main)', margin: '0 0 8px 0' }}>{profile.firstName} {profile.lastName}</h1>
+              <p style={{ fontSize: '16px', color: 'var(--color-text-muted)', margin: '0 0 16px 0' }}>{profile.headline || 'No headline provided'}</p>
+              <div className="d-flex align-items-center gap-2" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-muted)' }}>
                 {profile.location && (
-                  <>
-                    <span className="text-[16px]"><CiLocationOn /></span>
+                  <div className="d-flex align-items-center gap-1">
+                    <CiLocationOn size={16} />
                     <span>{profile.location}</span>
-                    <span className="mx-2 opacity-30">|</span>
-                  </>
+                  </div>
                 )}
                 {profile.links?.github && (
                   <>
-                    <span className="text-[16px]"><CiLink /></span>
-                    <a className="hover:text-primary transition-colors text-decoration-none text-on-surface-variant" href={profile.links.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-                    <span className="mx-2 opacity-30">|</span>
+                    <span style={{ opacity: 0.3 }}>|</span>
+                    <div className="d-flex align-items-center gap-1">
+                      <CiLink size={16} />
+                      <a href={profile.links.github} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>GitHub</a>
+                    </div>
                   </>
                 )}
                 {profile.links?.linkedin && (
                   <>
-                    <span className="text-[16px]"><CiLink /></span>
-                    <a className="hover:text-primary transition-colors text-decoration-none text-on-surface-variant" href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                    <span style={{ opacity: 0.3 }}>|</span>
+                    <div className="d-flex align-items-center gap-1">
+                      <CiLink size={16} />
+                      <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>LinkedIn</a>
+                    </div>
                   </>
                 )}
               </div>
             </div>
-            <div className="flex gap-sm">
+            <div className="d-flex gap-3 mt-3 mt-md-0">
               {isOwn ? (
-                <button onClick={() => setEditing(true)} className="h-[40px] px-lg rounded-full border border-white/10 bg-transparent text-on-surface font-body-sm text-body-sm glass-panel hover:bg-white/5 transition-colors active:scale-95">
+                <button onClick={() => setEditing(true)} className="btn-h-outline">
                   Edit Profile
                 </button>
               ) : (
-                <button onClick={sendConnectionRequest} className="h-[40px] px-lg rounded-full border border-primary/20 bg-primary/10 text-primary font-body-sm text-body-sm hover:bg-primary hover:text-on-primary transition-colors active:scale-95">
+                <button onClick={sendConnectionRequest} className="btn-h-primary">
                   Connect
                 </button>
               )}
@@ -252,93 +248,93 @@ export default function ProfilePage() {
       <div className="max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop py-lg">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
           {/* Left Column: Skills & Info (4 cols) */}
-          <div className="lg:col-span-4 flex flex-col gap-gutter">
+          <div className="col-12 col-lg-4 d-flex flex-column gap-4">
             {/* Skills Card */}
-            <div className="glass-panel rounded-xl p-md border border-white/10">
-              <h2 className="font-headline-md text-headline-md text-on-surface mb-4 pb-2 border-b border-white/5 flex items-center gap-xs">
-                <span className="text-primary"><CiStar /></span>
+            <div className="card-minimal">
+              <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--color-text-main)', marginBottom: '16px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--color-primary)' }}><CiStar /></span>
                 Skills
               </h2>
-              <div className="flex flex-wrap gap-2">
+              <div className="d-flex flex-wrap gap-2">
                 {skillsArr.length > 0 ? skillsArr.map(s => (
-                  <span key={s} className="font-code-block text-code-block px-3 py-1 rounded-full border border-white/10 bg-surface-container-high text-on-surface">{s}</span>
-                )) : <span className="text-on-surface-variant font-body-sm">No skills added yet.</span>}
+                  <span key={s} className="skill-tag">{s}</span>
+                )) : <span style={{ color: 'var(--color-text-muted)' }}>No skills added yet.</span>}
               </div>
             </div>
             
             {/* About Card */}
-            <div className="glass-panel rounded-xl p-md border border-white/10">
-              <h2 className="font-headline-md text-headline-md text-on-surface mb-4 pb-2 border-b border-white/5 flex items-center gap-xs">
-                <span className="text-primary"><CiSettings /></span>
+            <div className="card-minimal">
+              <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--color-text-main)', marginBottom: '16px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--color-primary)' }}><CiSettings /></span>
                 About
               </h2>
-              <p className="font-body-sm text-on-surface-variant whitespace-pre-wrap leading-relaxed">
+              <p style={{ fontSize: '15px', color: 'var(--color-text-muted)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                 {profile.about || 'No about information provided.'}
               </p>
             </div>
           </div>
           
           {/* Right Column: Experience (8 cols) */}
-          <div className="lg:col-span-8 flex flex-col gap-gutter">
+          <div className="col-12 col-lg-8 d-flex flex-column gap-4">
             {/* Experience Card */}
-            <div className="glass-panel rounded-xl p-md border border-white/10">
-              <h2 className="font-headline-md text-headline-md text-on-surface mb-6 pb-2 border-b border-white/5 flex items-center gap-xs">
-                <span className="text-primary"><CiBag1 /></span>
+            <div className="card-minimal">
+              <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--color-text-main)', marginBottom: '24px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--color-primary)' }}><CiBag1 /></span>
                 Experience
               </h2>
-              <div className="flex flex-col gap-lg">
+              <div className="d-flex flex-column gap-4">
                 {profile.experience && profile.experience.length > 0 ? (
                   profile.experience.map((exp, idx) => (
-                    <div key={idx} className="relative pl-8">
+                    <div key={idx} style={{ position: 'relative', paddingLeft: '32px' }}>
                       {/* Timeline line */}
                       {idx !== profile.experience.length - 1 && (
-                        <div className="absolute left-3 top-8 bottom-[-24px] w-px bg-white/10"></div>
+                        <div style={{ position: 'absolute', left: '11px', top: '24px', bottom: '-24px', width: '2px', backgroundColor: 'var(--color-border)' }}></div>
                       )}
                       {/* Timeline node */}
-                      <div className="absolute left-1.5 top-1.5 w-3 h-3 rounded-full bg-primary ring-4 ring-surface-container-high"></div>
+                      <div style={{ position: 'absolute', left: '6px', top: '6px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', border: '2px solid var(--bg-card)' }}></div>
                       
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
+                      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start mb-2">
                         <div>
-                          <h3 className="font-body-lg text-body-lg font-bold text-on-surface mb-1">{exp.title}</h3>
-                          <div className="font-label-mono text-label-mono text-primary mb-2">{exp.company}</div>
+                          <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-text-main)', margin: '0 0 4px 0' }}>{exp.title}</h3>
+                          <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-primary)', marginBottom: '8px' }}>{exp.company}</div>
                         </div>
-                        <div className="font-label-mono text-label-mono text-on-surface-variant bg-white/5 px-2 py-1 rounded border border-white/10 inline-block self-start">
+                        <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-muted)', backgroundColor: 'var(--bg-body)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
                           {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                         </div>
                       </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                      <p style={{ fontSize: '14px', color: 'var(--color-text-muted)', lineHeight: 1.6, margin: 0 }}>
                         {exp.description}
                       </p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-on-surface-variant font-body-sm">No experience added yet.</p>
+                  <p style={{ color: 'var(--color-text-muted)' }}>No experience added yet.</p>
                 )}
               </div>
             </div>
             
             {/* Education Card */}
-            <div className="glass-panel rounded-xl p-md border border-white/10">
-              <h2 className="font-headline-md text-headline-md text-on-surface mb-6 pb-2 border-b border-white/5 flex items-center gap-xs">
-                <span className="text-primary"><CiBank /></span>
+            <div className="card-minimal">
+              <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--color-text-main)', marginBottom: '24px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--color-primary)' }}><CiBank /></span>
                 Education
               </h2>
-              <div className="flex flex-col gap-md">
+              <div className="d-flex flex-column gap-3">
                 {profile.education && profile.education.length > 0 ? (
                   profile.education.map((edu, idx) => (
-                    <div key={idx} className="flex gap-4 items-start p-sm rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
-                      <div className="w-12 h-12 rounded-lg bg-surface-container-high border border-white/10 flex items-center justify-center text-on-surface-variant flex-shrink-0">
+                    <div key={idx} className="d-flex gap-3 align-items-start" style={{ padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', backgroundColor: 'var(--bg-body)' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '8px', backgroundColor: 'var(--bg-nav)', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)', flexShrink: 0 }}>
                         <CiBank size={24} />
                       </div>
                       <div>
-                        <h3 className="font-body-lg text-body-lg font-bold text-on-surface mb-1">{edu.school}</h3>
-                        <div className="font-body-sm text-body-sm text-on-surface-variant mb-1">{edu.degree}{edu.fieldOfStudy ? `, ${edu.fieldOfStudy}` : ''}</div>
-                        <div className="font-label-mono text-label-mono text-on-surface-variant opacity-70">{edu.startDate} - {edu.endDate}</div>
+                        <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-text-main)', margin: '0 0 4px 0' }}>{edu.school}</h3>
+                        <div style={{ fontSize: '14px', color: 'var(--color-text-muted)', margin: '0 0 4px 0' }}>{edu.degree}{edu.fieldOfStudy ? `, ${edu.fieldOfStudy}` : ''}</div>
+                        <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--color-text-muted)', opacity: 0.7 }}>{edu.startDate} - {edu.endDate}</div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-on-surface-variant font-body-sm">No education added yet.</p>
+                  <p style={{ color: 'var(--color-text-muted)' }}>No education added yet.</p>
                 )}
               </div>
             </div>

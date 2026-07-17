@@ -47,24 +47,25 @@ export default function Feed() {
   return (
     <>
       {/* Center Column (Feed) */}
-      <div className="w-full max-w-[680px] py-md flex flex-col gap-md">
+      <div style={{ width: '100%', maxWidth: '680px', paddingTop: '24px', paddingBottom: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <CreatePost onPosted={handlePosted} />
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-          <button className="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-label-mono text-label-mono whitespace-nowrap">For You</button>
-          <button className="px-4 py-1.5 rounded-full bg-transparent border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-label-mono text-label-mono whitespace-nowrap">Projects</button>
-          <button className="px-4 py-1.5 rounded-full bg-transparent border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-label-mono text-label-mono whitespace-nowrap">Questions</button>
-          <button className="px-4 py-1.5 rounded-full bg-transparent border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-label-mono text-label-mono whitespace-nowrap">Achievements</button>
+        <div className="segmented-control" style={{ overflowX: 'auto', marginBottom: '8px' }}>
+          <button className="btn active">For You</button>
+          <button className="btn">Projects</button>
+          <button className="btn">Questions</button>
+          <button className="btn">Achievements</button>
         </div>
 
         {posts.length === 0 && !loading ? (
-          <div className="glass-panel text-center py-5 border border-white/10 rounded-xl flex flex-col items-center">
-            <div className="text-on-surface-variant mb-4 opacity-50">
+        {posts.length === 0 && !loading ? (
+          <div className="card-minimal d-flex flex-column align-items-center justify-content-center text-center" style={{ padding: '48px 24px' }}>
+            <div style={{ color: 'var(--color-text-muted)', marginBottom: '16px', opacity: 0.5 }}>
               <CiMonitor size={48} />
             </div>
-            <p className="font-body-lg text-body-lg text-on-surface mb-2">Your feed is empty.</p>
-            <Link to="/discover" className="text-primary font-bold hover:underline">Discover people</Link>
+            <p style={{ fontSize: '16px', fontWeight: 500, color: 'var(--color-text-main)', marginBottom: '8px' }}>Your feed is empty.</p>
+            <Link to="/discover" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>Discover people</Link>
           </div>
         ) : (
           <div className="flex flex-col gap-sm">
@@ -72,20 +73,21 @@ export default function Feed() {
               <React.Fragment key={p._id || p.id}>
                 <PostCard post={p} onLike={handleLikeUpdate} onDelete={handlePostDelete} />
                 {index === 2 && (
-                  <div className="glass-panel py-4 px-0 border border-white/10 rounded-xl">
-                    <div className="px-4 mb-3 flex justify-between items-center">
-                      <h6 className="font-body-sm font-bold text-on-surface m-0">Suggested Developers</h6>
-                      <Link to="/discover" className="text-[13px] font-bold text-primary text-decoration-none hover:underline">View all</Link>
+                {index === 2 && (
+                  <div className="card-minimal" style={{ padding: '24px 0' }}>
+                    <div className="d-flex justify-content-between align-items-center" style={{ padding: '0 24px', marginBottom: '16px' }}>
+                      <h6 style={{ fontWeight: 600, color: 'var(--color-text-main)', margin: 0 }}>Suggested Developers</h6>
+                      <Link to="/discover" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none' }}>View all</Link>
                     </div>
-                    <div className="flex gap-3 px-4 overflow-auto pb-2 no-scrollbar">
+                    <div className="d-flex gap-3" style={{ padding: '0 24px', overflowX: 'auto', paddingBottom: '8px' }}>
                       {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="text-center p-3 flex-shrink-0 w-[160px] border border-white/10 rounded-xl bg-surface/50">
-                          <div className="w-14 h-14 mx-auto rounded-full bg-surface-container flex items-center justify-center mb-3">
-                             <img src={`https://api.dicebear.com/7.x/initials/svg?seed=dev${i}`} className="w-full h-full rounded-full object-cover" />
+                        <div key={i} style={{ flexShrink: 0, width: '160px', padding: '16px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-body)', textAlign: 'center' }}>
+                          <div style={{ width: '56px', height: '56px', margin: '0 auto 12px auto', borderRadius: '50%', backgroundColor: 'var(--bg-nav)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                             <img src={`https://api.dicebear.com/7.x/initials/svg?seed=dev${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="avatar" />
                           </div>
-                          <div className="truncate font-body-sm font-bold text-on-surface">Developer {i}</div>
-                          <div className="truncate text-[12px] text-on-surface-variant mb-3">Software Engineer</div>
-                          <button className="w-full text-[13px] p-1.5 rounded-md border border-white/10 text-on-surface font-medium hover:bg-white/5 transition-colors">Connect</button>
+                          <div style={{ fontWeight: 600, color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Developer {i}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '12px' }}>Software Engineer</div>
+                          <button className="btn-h-light w-100" style={{ padding: '6px 0', fontSize: '13px' }}>Connect</button>
                         </div>
                       ))}
                     </div>
@@ -113,7 +115,7 @@ export default function Feed() {
               }
             }}
           >
-            <button className="rounded-full px-6 py-2 border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-label-mono" onClick={() => load(page + 1)} disabled={loading}>
+            <button className="btn-h-light" onClick={() => load(page + 1)} disabled={loading} style={{ padding: '8px 24px' }}>
               {loading ? 'Loading...' : 'Load More'}
             </button>
           </div>
@@ -121,17 +123,17 @@ export default function Feed() {
       </div>
 
       {/* Right Sidebar (Suggested) */}
-      <aside className="hidden xl:flex w-[280px] p-md flex-col gap-md">
-        <div className="glass-panel rounded-xl p-md border border-white/10">
-          <h3 className="font-body-sm font-bold text-on-surface mb-sm border-b border-white/10 pb-xs">Trending Topics</h3>
-          <div className="flex flex-col gap-sm">
-            <a className="group" href="#">
-              <div className="font-label-mono text-on-surface-variant mb-1 group-hover:text-primary transition-colors">#rustlang</div>
-              <div className="font-body-sm text-on-surface">Memory safety in embedded systems</div>
+      <aside className="d-none d-xl-flex flex-column" style={{ width: '280px', padding: '24px 0', gap: '24px' }}>
+        <div className="card-minimal">
+          <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-main)', marginBottom: '16px', paddingBottom: '8px', borderBottom: '1px solid var(--color-border)' }}>Trending Topics</h3>
+          <div className="d-flex flex-column gap-3">
+            <a href="#" className="text-decoration-none group">
+              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '4px', transition: 'color 0.2s ease' }} className="group-hover-primary">#rustlang</div>
+              <div style={{ fontSize: '14px', color: 'var(--color-text-main)' }}>Memory safety in embedded systems</div>
             </a>
-            <a className="group" href="#">
-              <div className="font-label-mono text-on-surface-variant mb-1 group-hover:text-primary transition-colors">#architecture</div>
-              <div className="font-body-sm text-on-surface">Event-driven vs Polling</div>
+            <a href="#" className="text-decoration-none group">
+              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '4px', transition: 'color 0.2s ease' }} className="group-hover-primary">#architecture</div>
+              <div style={{ fontSize: '14px', color: 'var(--color-text-main)' }}>Event-driven vs Polling</div>
             </a>
           </div>
         </div>

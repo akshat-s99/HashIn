@@ -10,7 +10,8 @@ import {
   CiSearch,
   CiUser,
   CiStar,
-  CiMail
+  CiMail,
+  CiLogout
 } from 'react-icons/ci'
 
 export default function Navbar() {
@@ -18,10 +19,10 @@ export default function Navbar() {
   const location = useLocation()
 
   const navItems = [
-    { name: 'Home', path: '/feed', icon: CiHome },
+    { name: 'Feed', path: '/feed', icon: CiHome },
     { name: 'Network', path: '/network', icon: CiStar },
-    { name: 'Explore', path: '/explore', icon: CiCompass1 },
-    { name: 'Messaging', path: '/messaging', icon: CiMail },
+    { name: 'Discover', path: '/explore', icon: CiCompass1 },
+    { name: 'Messages', path: '/messaging', icon: CiMail },
     { name: 'Saved', path: '/saved', icon: CiBookmark },
   ]
 
@@ -29,77 +30,72 @@ export default function Navbar() {
 
   return (
     <>
-      {/* TopNavBar for Mobile */}
-      <header className="md:hidden flex items-center justify-between px-margin-mobile w-full h-16 bg-surface/80 backdrop-blur-md border-b border-white/10 fixed top-0 z-50">
-        <Link to="/feed" className="font-headline-md text-headline-md text-primary font-bold tracking-tight text-decoration-none">HashIn</Link>
-        <div className="flex items-center gap-sm">
-          <button className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center border border-white/10 text-on-surface-variant hover:text-primary transition-colors">
-            <CiSearch size={20} />
-          </button>
-          <Link to="/profile" className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label-mono text-label-mono text-decoration-none">
-            {user?.firstName?.charAt(0) || 'U'}
-          </Link>
-        </div>
-      </header>
-
-      {/* SideNavBar for Desktop */}
-      <nav className="hidden md:flex flex-col py-md px-sm gap-xs fixed left-0 top-0 h-full w-[240px] bg-surface border-r border-white/10 z-40">
-        <div className="mb-lg px-sm">
-          <Link to="/feed" className="font-headline-md text-headline-md text-primary mb-xs text-decoration-none d-block">HashIn</Link>
-          <div className="font-label-mono text-label-mono text-on-surface-variant">Engineer Network</div>
-        </div>
-        
-        <div className="flex items-center gap-sm px-sm py-xs mb-md">
-          <div className="w-10 h-10 rounded-full bg-surface-container border border-white/10 flex items-center justify-center font-label-mono text-label-mono text-on-surface text-uppercase">
-            {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-          </div>
-          <div>
-            <Link to="/profile" className="font-body-lg text-body-lg text-on-surface text-decoration-none hover:text-primary">{user?.firstName} {user?.lastName}</Link>
-            <div className="flex gap-sm font-label-mono text-label-mono text-on-surface-variant mt-1">
-              <span><span className="text-on-surface">{user?.connections?.length || 0}</span> C</span>
+      {/* Top Navbar (Desktop & Mobile combined logic) */}
+      <header className="navbar" style={{ padding: '0 24px', justifyContent: 'space-between' }}>
+        <div className="d-flex align-items-center h-100" style={{ maxWidth: '1200px', width: '100%', margin: '0 auto', justifyContent: 'space-between' }}>
+          {/* Logo */}
+          <div className="d-flex align-items-center gap-4 h-100">
+            <Link to="/feed" style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-text-main)', textDecoration: 'none' }}>
+              HashIn
+            </Link>
+            
+            {/* Desktop Search (optional) */}
+            <div className="d-none d-md-flex align-items-center" style={{ position: 'relative' }}>
+              <CiSearch size={20} style={{ position: 'absolute', left: '12px', color: 'var(--color-text-muted)' }} />
+              <input className="form-control rounded-pill" style={{ paddingLeft: '40px', width: '280px', height: '40px', backgroundColor: 'var(--bg-body)' }} placeholder="Search HashIn..." />
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-xs flex-grow">
-          {navItems.map((item) => (
-            <Link 
-              key={item.name}
-              to={item.path}
-              className={`flex items-center gap-xs px-sm py-xs cursor-pointer rounded-xl group text-decoration-none transition-all ${isActive(item.path) ? 'text-primary bg-primary/5' : 'text-on-surface-variant hover:bg-white/5'}`}
-            >
-              <span className={`transition-colors ${isActive(item.path) ? 'text-primary' : 'group-hover:text-primary'}`}>
-                <item.icon size={20} />
-              </span>
-              <span className="font-body-sm text-body-sm font-bold">{item.name}</span>
+          {/* Desktop Navigation */}
+          <nav className="d-none d-md-flex align-items-center h-100" style={{ gap: '8px' }}>
+            {navItems.map((item) => (
+              <Link 
+                key={item.name}
+                to={item.path}
+                className={`nav-link h-100 d-flex align-items-center gap-2 ${isActive(item.path) ? 'active' : ''}`}
+                style={{ padding: '0 12px' }}
+              >
+                <item.icon size={22} />
+                <span>{item.name}</span>
+              </Link>
+            ))}
+          </nav>
+
+          {/* Desktop User Menu & Mobile Actions */}
+          <div className="d-flex align-items-center gap-3">
+            <div className="d-md-none">
+              <button className="btn-action-minimal" style={{ padding: '8px' }}>
+                <CiSearch size={24} />
+              </button>
+            </div>
+            
+            <Link to="/profile" className="text-decoration-none d-none d-md-flex align-items-center gap-2 hover-bg" style={{ padding: '4px 12px 4px 4px', borderRadius: 'var(--radius-pill)', border: '1px solid transparent', transition: 'all 0.2s ease' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--bg-body)', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontWeight: 600, fontSize: '13px', color: 'var(--color-text-main)' }}>
+                {user?.avatar ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="avatar" /> : <>{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</>}
+              </div>
+              <span className="d-none d-lg-block" style={{ fontWeight: 600, fontSize: '14px', color: 'var(--color-text-main)' }}>{user?.firstName}</span>
             </Link>
-          ))}
-          
-          <div className="mt-auto flex flex-col gap-xs">
-            <Link to="/settings" className="flex items-center gap-xs text-on-surface-variant px-sm py-xs hover:bg-white/5 transition-all cursor-pointer rounded-xl group text-decoration-none">
-              <span className="group-hover:text-primary transition-colors"><CiSettings size={20} /></span>
-              <span className="font-body-sm text-body-sm">Settings</span>
-            </Link>
-            <button onClick={logout} className="flex items-center gap-xs text-on-surface-variant px-sm py-xs hover:bg-error/10 hover:text-error transition-all cursor-pointer rounded-xl group bg-transparent border-0 text-left w-100">
-              <span className="group-hover:text-error transition-colors"><CiUser size={20} /></span>
-              <span className="font-body-sm text-body-sm">Log out</span>
+            
+            <button onClick={logout} className="btn-action-minimal d-none d-md-flex" title="Log out">
+              <CiLogout size={22} />
             </button>
           </div>
         </div>
-      </nav>
-      
+      </header>
+
       {/* Bottom Nav for Mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-surface/90 backdrop-blur-md border-t border-white/10 z-50 flex items-center justify-around px-sm">
+      <nav className="d-md-none" style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', height: '64px', backgroundColor: 'var(--color-overlay)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderTop: '1px solid var(--color-border)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '0 16px' }}>
         {navItems.slice(0, 4).map((item) => (
           <Link 
             key={item.name}
             to={item.path}
-            className={`flex flex-col items-center justify-center w-12 h-12 rounded-full transition-colors ${isActive(item.path) ? 'text-primary bg-primary/10' : 'text-on-surface-variant'}`}
+            className={`d-flex flex-column align-items-center justify-content-center`}
+            style={{ width: '48px', height: '48px', borderRadius: '50%', color: isActive(item.path) ? 'var(--color-primary)' : 'var(--color-text-muted)', backgroundColor: isActive(item.path) ? 'var(--color-badge-bg)' : 'transparent', textDecoration: 'none', transition: 'all 0.2s ease' }}
           >
             <item.icon size={24} />
           </Link>
         ))}
-        <Link to="/profile" className={`flex flex-col items-center justify-center w-12 h-12 rounded-full transition-colors ${isActive('/profile') ? 'text-primary bg-primary/10' : 'text-on-surface-variant'}`}>
+        <Link to="/profile" className={`d-flex flex-column align-items-center justify-content-center`} style={{ width: '48px', height: '48px', borderRadius: '50%', color: isActive('/profile') ? 'var(--color-primary)' : 'var(--color-text-muted)', backgroundColor: isActive('/profile') ? 'var(--color-badge-bg)' : 'transparent', textDecoration: 'none', transition: 'all 0.2s ease' }}>
             <CiUser size={24} />
         </Link>
       </nav>

@@ -101,92 +101,98 @@ export default function PostCard({ post, onLike, onDelete }) {
   if (!local) return null;
 
   return (
-    <article className="glass-panel rounded-xl flex flex-col mb-4 border border-white/10 bg-surface/50">
-      <div className="p-md flex flex-col gap-sm">
-        {/* Author Row */}
-        <div className="flex justify-between items-start">
-          <Link to={`/profile/${author._id}`} className="flex gap-sm items-center text-decoration-none group">
-            <div className="w-10 h-10 rounded-full bg-surface-container border border-white/10 flex-shrink-0 flex items-center justify-center font-label-mono text-label-mono text-on-surface text-uppercase overflow-hidden">
-              {author.avatar ? <img src={author.avatar} className="w-full h-full object-cover" /> : <>{author.firstName?.charAt(0)}{author.lastName?.charAt(0)}</>}
-            </div>
-            <div>
-              <div className="font-body-sm text-body-sm font-bold text-on-surface group-hover:text-primary transition-colors">{author.firstName} {author.lastName}</div>
-              <div className="font-label-mono text-label-mono text-on-surface-variant">{author.headline} • {local.createdAt ? timeAgo(local.createdAt) : ''}</div>
-            </div>
-          </Link>
-          <div className="flex items-center gap-1">
-            {isOwner && (
-              <button onClick={handleDelete} disabled={loading} className="text-error hover:bg-error/10 p-1.5 rounded-full transition-colors" title="Delete post">
-                <CiTrash size={20} />
+    <article className="card-minimal mb-4" style={{ padding: '24px', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+      {/* Header */}
+      <div className="d-flex align-items-start mb-3" style={{ gap: '16px' }}>
+        <Link to={`/profile/${author._id}`} className="text-decoration-none">
+          <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '1px solid var(--color-border)', overflow: 'hidden', backgroundColor: 'var(--bg-body)' }}>
+            {author.avatar ? <img src={author.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div className="d-flex align-items-center justify-content-center h-100 text-uppercase fw-bold text-muted">{author.firstName?.charAt(0)}{author.lastName?.charAt(0)}</div>}
+          </div>
+        </Link>
+        <div style={{ flex: 1 }}>
+          <div className="d-flex justify-content-between align-items-start">
+            <Link to={`/profile/${author._id}`} className="text-decoration-none" style={{ color: 'var(--color-text-main)' }}>
+              <div style={{ fontWeight: 600, fontSize: '15px' }}>{author.firstName} {author.lastName}</div>
+              <div style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>{author.headline || 'Developer'} • {local.createdAt ? timeAgo(local.createdAt) : ''}</div>
+            </Link>
+            
+            <div className="d-flex align-items-center gap-2">
+              {isOwner && (
+                <button onClick={handleDelete} disabled={loading} className="btn-action-minimal" style={{ color: 'var(--color-danger)' }} title="Delete post">
+                  <CiTrash size={18} />
+                </button>
+              )}
+              <button className="btn-action-minimal" title="More">
+                <CiMenuKebab size={18} />
               </button>
-            )}
-            <button className="text-on-surface-variant hover:text-on-surface p-1.5 rounded-full hover:bg-white/5 transition-colors">
-              <CiMenuKebab size={20} />
-            </button>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="font-body-sm text-body-sm text-on-surface leading-relaxed whitespace-pre-wrap">
-          {local.content}
+      {/* Content */}
+      <div style={{ fontSize: '15px', color: 'var(--color-text-main)', lineHeight: 1.6, whiteSpace: 'pre-wrap', marginBottom: '16px' }}>
+        {local.content}
+      </div>
+
+      {/* Media */}
+      {local.mediaUrl && (
+        <div style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
+          <img src={local.mediaUrl} alt="Post content" style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', display: 'block' }} loading="lazy" />
         </div>
+      )}
 
-        {/* Media */}
-        {local.mediaUrl && (
-          <div className="mt-2 rounded-lg overflow-hidden border border-white/10">
-            <img src={local.mediaUrl} alt="Post content" className="w-full max-h-[400px] object-cover" loading="lazy" />
-          </div>
-        )}
+      {/* Stats */}
+      <div className="d-flex align-items-center gap-4 py-2" style={{ borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)', fontSize: '13px', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
+        <span>{local.likesCount || 0} likes</span>
+        <span>{comments ? comments.length : (local.comments?.length || 0)} comments</span>
+        <div className="flex-grow-1"></div>
+        <button onClick={toggleBookmark} className="btn-action-minimal" style={{ padding: 0 }}>
+          <CiBookmark size={18} style={{ color: isBookmarked ? 'var(--color-primary)' : 'inherit' }} />
+        </button>
+      </div>
 
-        {/* Action Bar */}
-        <div className="flex items-center gap-md mt-xs pt-sm border-t border-white/5">
-          <button onClick={toggleLike} disabled={loading} className={`flex items-center gap-2 transition-colors group ${local.liked ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
-            <span className="group-hover:scale-110 transition-transform"><CiHeart size={20} /></span>
-            <span className="font-label-mono text-label-mono">{local.likesCount || 0}</span>
-          </button>
-          <button onClick={async () => { setExpanded(!expanded); if (!expanded) await loadComments(); }} className={`flex items-center gap-2 transition-colors group ${expanded ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
-            <span className="group-hover:scale-110 transition-transform"><CiChat1 size={20} /></span>
-            <span className="font-label-mono text-label-mono">{comments ? comments.length : (local.comments?.length || 0)}</span>
-          </button>
-          <button className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors group">
-            <span className="group-hover:scale-110 transition-transform"><CiShare1 size={20} /></span>
-          </button>
-          
-          <div className="flex-grow"></div>
-          
-          <button onClick={toggleBookmark} className={`transition-colors group ${isBookmarked ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
-            <span className="group-hover:scale-110 transition-transform"><CiBookmark size={20} /></span>
-          </button>
-        </div>
+      {/* Action Bar */}
+      <div className="d-flex justify-content-around">
+        <button onClick={toggleLike} disabled={loading} className={`btn-action-minimal flex-grow-1 justify-content-center ${local.liked ? 'active' : ''}`} style={{ padding: '8px' }}>
+          <CiHeart size={20} /> Like
+        </button>
+        <button onClick={async () => { setExpanded(!expanded); if (!expanded) await loadComments(); }} className={`btn-action-minimal flex-grow-1 justify-content-center ${expanded ? 'active' : ''}`} style={{ padding: '8px' }}>
+          <CiChat1 size={20} /> Comment
+        </button>
+        <button className="btn-action-minimal flex-grow-1 justify-content-center" style={{ padding: '8px' }}>
+          <CiShare1 size={20} /> Share
+        </button>
       </div>
 
       {/* Comments Section */}
       {expanded && (
-        <div className="px-md pb-md bg-surface-container-lowest/50 rounded-b-xl border-t border-white/5">
-          <div className="flex gap-2 align-items-center mb-4 mt-md">
+      {expanded && (
+        <div style={{ backgroundColor: 'var(--bg-body)', margin: '-24px', marginTop: '16px', padding: '24px', borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)', borderTop: '1px solid var(--color-border)' }}>
+          <div className="d-flex gap-2 align-items-center mb-4">
             <input 
-              className="w-full h-10 pl-sm pr-sm bg-surface border border-white/10 rounded-full text-on-surface font-body-sm focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/50 transition-colors outline-none"
+              className="form-control rounded-pill"
               value={commentInput} 
               onChange={e => setCommentInput(e.target.value)} 
               placeholder="Add a comment..." 
             />
-            <button className="bg-primary/20 text-primary hover:bg-primary hover:text-on-primary font-label-mono text-label-mono px-4 py-2 rounded-full transition-colors disabled:opacity-50 font-bold" onClick={submitComment} disabled={postingComment || !commentInput.trim()}>
+            <button className="btn-h-primary" onClick={submitComment} disabled={postingComment || !commentInput.trim()} style={{ padding: '8px 20px' }}>
               {postingComment ? '...' : 'Reply'}
             </button>
           </div>
 
-          <div className="flex flex-col gap-sm mt-md">
+          <div className="d-flex flex-column gap-3">
             {(comments || []).map(c => (
-              <div key={c._id} className="flex gap-sm items-start">
-                <div className="w-8 h-8 rounded-full bg-surface-container border border-white/10 flex-shrink-0 flex items-center justify-center font-label-mono text-label-mono text-on-surface text-uppercase overflow-hidden text-[10px]">
-                  {c.author?.avatar ? <img src={c.author.avatar} className="w-full h-full object-cover" /> : <>{c.author?.firstName?.charAt(0)}{c.author?.lastName?.charAt(0)}</>}
+              <div key={c._id} className="d-flex gap-3 align-items-start">
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--bg-nav)', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontSize: '12px', fontWeight: 600 }}>
+                  {c.author?.avatar ? <img src={c.author.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <>{c.author?.firstName?.charAt(0)}{c.author?.lastName?.charAt(0)}</>}
                 </div>
-                <div className="flex-1 bg-surface-dim p-sm rounded-2xl rounded-tl-sm border border-white/5">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-body-sm font-bold text-on-surface text-[13px]">{c.author?.firstName} {c.author?.lastName}</span>
-                    <span className="font-label-mono text-on-surface-variant text-[11px]">{c.createdAt ? timeAgo(c.createdAt) : ''}</span>
+                <div style={{ flex: 1, backgroundColor: 'var(--bg-card)', padding: '12px 16px', borderRadius: 'var(--radius-md)', borderTopLeftRadius: '4px', border: '1px solid var(--color-border)' }}>
+                  <div className="d-flex justify-content-between align-items-start mb-1">
+                    <span style={{ fontWeight: 600, fontSize: '14px', color: 'var(--color-text-main)' }}>{c.author?.firstName} {c.author?.lastName}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{c.createdAt ? timeAgo(c.createdAt) : ''}</span>
                   </div>
-                  <div className="font-body-sm text-on-surface text-[14px] leading-snug">{c.content}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--color-text-main)', lineHeight: 1.5 }}>{c.content}</div>
                 </div>
               </div>
             ))}
