@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import PostCard from '../components/PostCard'
-import Card from '../components/Card'
 import { CiBookmark } from 'react-icons/ci'
 
 export default function SavedPosts() {
@@ -31,28 +30,25 @@ export default function SavedPosts() {
   }
 
   return (
-    <div className="container-fluid" style={{ maxWidth: '800px', paddingTop: '24px', paddingBottom: '48px' }}>
-      <div className="mb-4 d-flex align-items-center">
-        <h2 style={{ fontWeight: 700, color: 'var(--color-text-main)', margin: 0 }}>Saved Posts</h2>
-        <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)', marginLeft: '16px' }}></div>
+    <div className="w-full max-w-[680px] py-md flex flex-col gap-md relative z-10">
+      <div className="mb-4 pb-2 border-b border-white/10 flex items-center">
+        <h3 className="font-headline-md font-bold text-on-surface m-0">Saved Posts</h3>
       </div>
 
       {loading ? (
-        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '40vh' }}>
-          <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: 'var(--color-primary)' }} role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
+        <div className="flex justify-center items-center min-h-[40vh]">
+          <div className="w-8 h-8 border-2 border-white/20 border-t-primary rounded-full animate-spin"></div>
         </div>
       ) : posts.length === 0 ? (
-        <Card className="text-center py-5" style={{ border: '1px solid var(--color-border)', boxShadow: 'none' }}>
-          <div style={{ marginBottom: '16px', color: 'var(--color-border)' }}>
+        <div className="glass-panel text-center py-10 border border-white/10 rounded-xl flex flex-col items-center">
+          <div className="text-on-surface-variant opacity-50 mb-4">
             <CiBookmark size={48} />
           </div>
-          You haven't saved any posts yet.<br/>
-          <Link to="/" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>Go back to your feed</Link>
-        </Card>
+          <div className="text-on-surface font-body-sm mb-4">You haven't saved any posts yet.</div>
+          <Link to="/" className="text-primary font-bold hover:underline">Go back to your feed</Link>
+        </div>
       ) : (
-        <div className="d-flex flex-column gap-3">
+        <div className="flex flex-col gap-sm">
           {posts.map(p => (
             <PostCard 
               key={p._id || p.id} 

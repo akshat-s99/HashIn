@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react'
 import { CiImageOn, CiCalendarDate } from 'react-icons/ci'
-import Card from './Card'
 import api from '../api/axios'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
@@ -62,37 +61,25 @@ export default function CreatePost({ onPosted }) {
   }
 
   return (
-    <div className="card-minimal mb-4" style={{ padding: '16px' }}>
-      <div className="d-flex align-items-start gap-3">
-        <img src={user?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${user?._id}`} alt="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
-        <div style={{ flex: 1 }}>
+    <div className="glass-panel rounded-xl p-md flex flex-col gap-md border border-white/10 bg-surface/50">
+      <div className="flex gap-sm">
+        <div className="w-10 h-10 rounded-full bg-surface-container border border-white/10 flex-shrink-0 flex items-center justify-center font-label-mono text-label-mono text-on-surface text-uppercase overflow-hidden">
+          {user?.avatar ? <img src={user.avatar} className="w-full h-full object-cover" /> : <>{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</>}
+        </div>
+        <div className="flex-grow">
           <textarea 
-            className="form-control" 
-            rows={expanded ? "3" : "1"} 
-            style={{ 
-              resize: 'none', 
-              backgroundColor: 'var(--bg-body)', 
-              border: '1px solid var(--color-border)', 
-              color: 'var(--color-text-main)', 
-              borderRadius: expanded ? '12px' : '20px', 
-              padding: '10px 16px', 
-              transition: 'all 0.2s ease', 
-              minHeight: expanded ? '100px' : '40px', 
-              cursor: 'text',
-              fontSize: '14px'
-            }} 
-            value={content} 
-            onChange={e => setContent(e.target.value)} 
+            className={`w-full bg-transparent border-none text-body-lg font-body-lg text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 p-0 resize-none transition-all outline-none ${expanded ? 'h-24' : 'h-10'}`} 
+            placeholder="What's on your mind?"
+            value={content}
+            onChange={e => setContent(e.target.value)}
             onClick={() => setExpanded(true)}
-            placeholder="What's on your mind?" 
           />
           {mediaPreview && (
-            <div className="mt-2 position-relative" style={{ maxWidth: '300px' }}>
-              <img src={mediaPreview} alt="preview" style={{ width: '100%', borderRadius: '8px', objectFit: 'cover' }} />
+            <div className="relative mt-sm rounded-lg overflow-hidden border border-white/10 max-w-sm">
+              <img src={mediaPreview} alt="Preview" className="w-full h-auto object-cover" />
               <button 
-                className="btn btn-sm btn-dark position-absolute top-0 end-0 m-1 rounded-circle" 
-                style={{ width: '28px', height: '28px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)' }}
                 onClick={() => { setMedia(null); setMediaPreview('') }}
+                className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
               >
                 ×
               </button>
@@ -101,29 +88,24 @@ export default function CreatePost({ onPosted }) {
         </div>
       </div>
       
-      {expanded && (
-        <div className="mt-3 d-flex justify-content-between align-items-center" style={{ paddingLeft: '56px' }}>
-          <div className="d-flex gap-2">
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              accept="image/*" 
-              style={{ display: 'none' }} 
-            />
-            <button 
-              className="btn-action-minimal" 
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <CiImageOn size={20} />
-              Media
+      {(expanded || content || media) && (
+        <div className="flex justify-between items-center border-t border-white/5 pt-sm">
+          <div className="flex gap-xs">
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+            <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-white/5 transition-colors border border-transparent text-on-surface-variant group">
+              <span className="group-hover:text-primary transition-colors"><CiImageOn size={18} /></span>
+              <span className="font-label-mono text-label-mono">Media</span>
             </button>
-            <button className="btn-action-minimal">
-              <CiCalendarDate size={20} />
-              Event
+            <button className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-white/5 transition-colors border border-transparent text-on-surface-variant group">
+              <span className="group-hover:text-primary transition-colors"><CiCalendarDate size={18} /></span>
+              <span className="font-label-mono text-label-mono">Event</span>
             </button>
           </div>
-          <button className="btn-h-primary" onClick={submit} disabled={loading || (!content.trim() && !media)} style={{ borderRadius: '50px', padding: '6px 20px', fontWeight: 600, fontSize: '13px' }}>
+          <button 
+            onClick={submit}
+            disabled={loading || (!content.trim() && !media)}
+            className="bg-primary-container text-on-primary-container font-label-mono text-label-mono px-4 py-2 rounded-full hover:bg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+          >
             {loading ? 'Posting...' : 'Post'}
           </button>
         </div>

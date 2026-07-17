@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import api from '../api/axios'
-import Card from '../components/Card'
 import Modal from '../components/Modal'
 import { useToast } from '../contexts/ToastContext'
 import { CiUser, CiCircleRemove, CiHeart } from 'react-icons/ci'
@@ -9,27 +8,28 @@ function SwipeCard({ user, style, animatingAction }) {
   if (!user) return null
 
   let animClass = '';
-  if (animatingAction === 'like') animClass = 'swipe-out-right';
-  if (animatingAction === 'pass') animClass = 'swipe-out-left';
+  if (animatingAction === 'like') animClass = 'translate-x-full opacity-0 rotate-12';
+  if (animatingAction === 'pass') animClass = '-translate-x-full opacity-0 -rotate-12';
 
   return (
-    <div className={`swipe-card ${animClass}`} style={{ width: '320px', height: '440px', transition: 'all 0.3s ease', ...style }}>
-      <Card className="h-100 overflow-hidden d-flex flex-column p-0" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '16px' }}>
-        <img src={user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${user._id}`} alt="avatar" style={{ width: '100%', height: '260px', objectFit: 'cover' }} />
-        <div className="p-4 flex-grow-1 overflow-auto d-flex flex-column" style={{ backgroundColor: 'var(--bg-card)' }}>
+    <div className={`absolute top-0 left-0 w-full h-full transition-all duration-300 ${animClass}`} style={style}>
+      <div className="glass-panel h-full overflow-hidden flex flex-col p-0 border border-white/10 rounded-2xl relative">
+        <img src={user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${user._id}`} alt="avatar" className="w-full h-[260px] object-cover bg-surface-container" />
+        <div className="absolute top-[240px] left-0 w-full h-12 bg-gradient-to-t from-surface-dim to-transparent"></div>
+        <div className="p-md flex-1 overflow-auto flex flex-col bg-surface-dim z-10">
           <div className="mb-2">
-            <h4 className="mb-1" style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-text-main)' }}>{user.firstName} {user.lastName}</h4>
-            <div className="text-muted" style={{ fontSize: '14px', lineHeight: 1.3 }}>{user.headline || 'HashIn Member'}</div>
+            <h4 className="font-headline-md font-bold text-on-surface mb-1">{user.firstName} {user.lastName}</h4>
+            <div className="font-label-mono text-primary">{user.headline || 'HashIn Member'}</div>
           </div>
-          <p className="mb-3 flex-grow-1" style={{ fontSize: '14px', lineHeight: '1.5', color: 'var(--color-text-main)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+          <p className="mb-3 flex-1 font-body-sm text-on-surface-variant line-clamp-3">
             {user.about || 'No bio provided.'}
           </p>
-          <div className="d-flex flex-wrap gap-2 mt-auto">
-            {(user.skills || []).slice(0, 3).map(s => <span key={s} style={{ backgroundColor: 'var(--bg-body)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', padding: '4px 10px', borderRadius: '50px', fontSize: '12px', fontWeight: 600 }}>{s}</span>)}
-            {(user.skills || []).length > 3 && <span style={{ padding: '4px 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>+{user.skills.length - 3}</span>}
+          <div className="flex flex-wrap gap-2 mt-auto">
+            {(user.skills || []).slice(0, 3).map(s => <span key={s} className="font-code-block text-[11px] px-3 py-1 rounded-full border border-white/10 bg-surface-container-high text-on-surface">{s}</span>)}
+            {(user.skills || []).length > 3 && <span className="text-[11px] text-on-surface-variant py-1">+{user.skills.length - 3}</span>}
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }
@@ -93,39 +93,35 @@ export default function DiscoveryPage() {
   const next = stack[index + 1]
 
   return (
-    <div className="mx-auto" style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '20px' }}>
-      <h3 className="mb-4 align-self-start" style={{ fontWeight: 700, color: 'var(--color-text-main)' }}>Discover Connections</h3>
+    <div className="w-full max-w-[400px] mx-auto py-xl px-margin-mobile flex flex-col items-center">
+      <h3 className="mb-md self-start font-headline-md font-bold text-on-surface">Discover Connections</h3>
       
-      <div className="d-flex justify-content-center mb-4" style={{ width: '100%', height: '440px' }}>
+      <div className="flex justify-center mb-md w-full h-[460px] relative">
         {!top ? (
-          <Card className="text-center py-5 h-100 d-flex flex-column align-items-center justify-content-center w-100" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '16px' }}>
-            <div style={{ marginBottom: '16px', color: 'var(--color-border)' }}>
+          <div className="glass-panel text-center py-5 h-full flex flex-col items-center justify-center w-full border border-white/10 rounded-2xl">
+            <div className="text-on-surface-variant/50 mb-4">
               <CiUser size={48} />
             </div>
-            <div style={{ color: 'var(--color-text-main)', fontWeight: 500 }}>No more people to discover.<br/>Check back later!</div>
-          </Card>
+            <div className="text-on-surface-variant font-body-sm text-center">No more people to discover.<br/>Check back later!</div>
+          </div>
         ) : (
-          <div className="position-relative" style={{ width: '320px', height: '440px' }}>
+          <div className="relative w-full h-full perspective-1000">
             {stack.map((u, i) => {
               if (i < index || i > index + 1) return null;
               
               const isTop = i === index;
               
               return (
-                <div 
-                  key={u._id || u.id}
+                <SwipeCard 
+                  key={u._id || u.id} 
+                  user={u} 
+                  animatingAction={isTop ? animatingAction : null} 
                   style={{ 
-                    position: 'absolute', 
-                    top: isTop ? 0 : 8, 
-                    left: isTop ? 0 : 8, 
-                    transform: isTop ? 'scale(1)' : 'scale(0.95)', 
-                    zIndex: isTop ? 1 : 0, 
-                    opacity: isTop ? 1 : 0.8,
-                    transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
+                    zIndex: isTop ? 10 : 0, 
+                    transform: isTop ? 'scale(1)' : 'scale(0.95) translateY(10px)', 
+                    opacity: isTop ? 1 : 0.8
                   }}
-                >
-                  <SwipeCard user={u} animatingAction={isTop ? animatingAction : null} />
-                </div>
+                />
               );
             })}
           </div>
@@ -133,38 +129,34 @@ export default function DiscoveryPage() {
       </div>
 
       {top && (
-        <div className="d-flex justify-content-center gap-3 mt-3 w-100" style={{ maxWidth: '320px' }}>
+        <div className="flex justify-center gap-md mt-sm w-full">
           <button 
-            className="btn flex-fill d-flex align-items-center justify-content-center gap-2" 
+            className="flex-1 flex items-center justify-center gap-2 rounded-full py-3 px-4 font-bold text-[16px] glass-panel border border-white/10 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors disabled:opacity-50"
             onClick={() => swipe('pass')} 
-            disabled={!!animatingAction} 
-            style={{ borderRadius: '50px', padding: '12px', fontWeight: 600, fontSize: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', transition: 'all 0.2s' }}
-            onMouseOver={(e) => !animatingAction && (e.target.style.backgroundColor = 'var(--bg-body)')}
-            onMouseOut={(e) => e.target.style.backgroundColor = 'var(--bg-card)'}
+            disabled={!!animatingAction}
           >
-            <CiCircleRemove size={20} /> 
-            <span className="ms-1">Pass</span>
+            <CiCircleRemove size={24} /> 
+            <span>Pass</span>
           </button>
           <button 
-            className="btn-h-primary flex-fill d-flex align-items-center justify-content-center gap-2" 
+            className="flex-1 flex items-center justify-center gap-2 rounded-full py-3 px-4 font-bold text-[16px] bg-primary text-on-primary hover:bg-primary/90 transition-colors disabled:opacity-50"
             onClick={() => swipe('like')} 
-            disabled={!!animatingAction} 
-            style={{ borderRadius: '50px', padding: '12px', fontWeight: 600, fontSize: '16px' }}
+            disabled={!!animatingAction}
           >
-            <CiHeart size={20} />
-            <span className="ms-1">Connect</span>
+            <CiHeart size={24} />
+            <span>Connect</span>
           </button>
         </div>
       )}
 
       <Modal open={!!matchModal} onClose={() => setMatchModal(null)}>
-        <div className="text-center py-3">
-          <div style={{ marginBottom: '24px', color: 'var(--color-primary)' }}>
+        <div className="text-center py-md flex flex-col items-center">
+          <div className="text-primary mb-md animate-bounce">
             <CiHeart size={64} />
           </div>
-          <h3 style={{ color: 'var(--color-primary)', fontWeight: 700, marginBottom: '8px' }}>It's a Match!</h3>
-          {matchModal && <p className="mb-4 text-muted" style={{ fontSize: '15px' }}>You and {matchModal.firstName} have both swiped right on each other. A connection request has been accepted automatically.</p>}
-          <button className="btn-h-primary w-100" onClick={() => setMatchModal(null)} style={{ borderRadius: '50px', padding: '10px', fontWeight: 600 }}>Awesome</button>
+          <h3 className="text-on-surface font-headline-md font-bold mb-2">It's a Match!</h3>
+          {matchModal && <p className="mb-md text-on-surface-variant font-body-sm">You and {matchModal.firstName} have both swiped right on each other. A connection request has been accepted automatically.</p>}
+          <button className="bg-primary text-on-primary font-bold rounded-full py-2 px-6 w-full" onClick={() => setMatchModal(null)}>Awesome</button>
         </div>
       </Modal>
     </div>

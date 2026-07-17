@@ -3,16 +3,14 @@ import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import { useSocket } from '../contexts/SocketContext';
 import { useAuth } from '../contexts/AuthContext';
-import Card from '../components/Card';
-import Avatar from '../components/Avatar';
 import { timeAgo } from '../utils/timeAgo';
-import { CiChat1 } from 'react-icons/ci';
+import { CiChat1, CiSearch, CiMenuKebab } from 'react-icons/ci';
 
 export default function MessagingPage() {
   const { user } = useAuth();
   const { socket } = useSocket();
   const [conversations, setConversations] = useState([]);
-  const [activeChatId, setActiveChatId] = useState(null); // The other user's ID
+  const [activeChatId, setActiveChatId] = useState(null);
   const [activeChatUser, setActiveChatUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -20,7 +18,6 @@ export default function MessagingPage() {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    // Load conversations
     api.get('/messages/conversations').then((res) => {
       setConversations(res.data?.data || []);
     }).catch(console.error);
@@ -40,7 +37,6 @@ export default function MessagingPage() {
 
     const handleReceive = (data) => {
       const { message } = data;
-      // If the message is for the currently active chat
       if (
         (message.senderId === activeChatId && message.receiverId === user.id) ||
         (message.senderId === user.id && message.receiverId === activeChatId)
@@ -49,8 +45,6 @@ export default function MessagingPage() {
         scrollToBottom();
       }
       
-      // Update conversations list with latest message
-      // (Simplified logic: in a real app you'd move the convo to top)
       setConversations((prev) => {
         const copy = [...prev];
         const idx = copy.findIndex(c => c._id === message.conversationId);
@@ -99,141 +93,155 @@ export default function MessagingPage() {
   };
 
   return (
-    <div className="container mt-4" style={{ height: 'calc(100vh - 100px)' }}>
-      <div className="row h-100">
+    <div className="flex-1 flex flex-col md:flex-row h-[calc(100vh-64px)] relative overflow-hidden bg-surface-dim z-10 w-full">
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-20" style={{background: 'radial-gradient(circle at 70% 30%, rgba(220, 20, 60, 0.15) 0%, transparent 50%)'}}></div>
+      
+      {/* Left Column: Conversation List */}
+      <aside className={`w-full md:w-[320px] flex-shrink-0 flex flex-col h-full border-r border-white/10 glass-panel z-10 relative ${activeChatId ? 'hidden md:flex' : 'flex'}`}>
+        {/* Header */}
+        <div className="p-md pb-4 flex flex-col gap-4 border-b border-white/10">
+          <div className="flex items-center justify-between">
+            <h2 className="font-headline-md text-headline-md font-bold tracking-tight text-on-surface">Messaging</h2>
+          </div>
+          {/* Search Bar */}
+          <div className="relative w-full">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm"><CiSearch /></span>
+            <input className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 font-body-sm text-on-surface placeholder:font-code-block placeholder:text-on-surface-variant/50 focus:border-primary outline-none transition-colors" placeholder="Search conversations..." type="text" />
+          </div>
+        </div>
         
-        {/* Left Sidebar - Conversations List */}
-        <div className="col-md-4 h-100 d-flex flex-column">
-          <Card className="h-100 d-flex flex-column p-0 overflow-hidden" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-            <div className="p-3 border-bottom d-flex align-items-center" style={{ height: '70px', backgroundColor: 'var(--bg-card)' }}>
-              <h5 className="m-0" style={{ fontWeight: 700, color: 'var(--color-text-main)' }}>Messaging</h5>
+        {/* List */}
+        <div className="flex-1 overflow-y-auto no-scrollbar">
+          {conversations.length === 0 ? (
+            <div className="p-5 flex flex-col items-center justify-center h-full text-on-surface-variant opacity-70">
+              <CiChat1 size={48} className="mb-4" />
+              <div className="font-body-sm">No conversations yet.</div>
             </div>
-            <div className="flex-grow-1 overflow-auto" style={{ backgroundColor: 'var(--bg-card)' }}>
-              {conversations.length === 0 ? (
-                <div className="p-5 text-center text-muted d-flex flex-column align-items-center">
-                  <div style={{ marginBottom: '16px', color: 'var(--color-border)' }}>
-                    <CiChat1 size={48} />
+          ) : (
+            conversations.map(c => {
+              const other = getOtherParticipant(c);
+              if (!other) return null;
+              const isActive = activeChatId === (other._id || other.id);
+              
+              return (
+                <div 
+                  key={c._id}
+                  className={`p-4 flex items-start gap-3 cursor-pointer transition-colors border-l-2 ${isActive ? 'bg-white/5 border-primary' : 'border-transparent hover:bg-white/5'}`}
+                  onClick={() => {
+                    setActiveChatId(other._id || other.id);
+                    setActiveChatUser(other);
+                  }}
+                >
+                  <div className="relative shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-label-mono text-label-mono text-on-surface border border-white/10 overflow-hidden text-uppercase">
+                      {other.avatar ? <img src={other.avatar} className="w-full h-full object-cover" /> : <>{other.firstName?.charAt(0)}{other.lastName?.charAt(0)}</>}
+                    </div>
+                    {onlineUsers.includes(other._id || other.id) && (
+                      <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#4ade80] rounded-full border-2 border-surface-container-low"></div>
+                    )}
                   </div>
-                  <div style={{ fontSize: '15px', fontWeight: 500 }}>No conversations yet.</div>
-                </div>
-              ) : (
-                conversations.map(c => {
-                  const other = getOtherParticipant(c);
-                  if (!other) return null;
-                  
-                  return (
-                    <div 
-                      key={c._id}
-                      className={`d-flex align-items-center p-3 border-bottom`}
-                      onClick={() => {
-                        setActiveChatId(other._id || other.id);
-                        setActiveChatUser(other);
-                      }}
-                      style={{ 
-                        cursor: 'pointer', 
-                        transition: 'background-color 0.2s ease', 
-                        backgroundColor: activeChatId === (other._id || other.id) ? 'var(--color-overlay-hover)' : 'transparent' 
-                      }}
-                    >
-                      <div className="position-relative">
-                        <img src={other.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${other._id}`} alt="avatar" style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
-                        {onlineUsers.includes(other._id || other.id) && (
-                          <div style={{ position: 'absolute', bottom: '0', right: '0', width: '12px', height: '12px', backgroundColor: '#10b981', border: '2px solid #fff', borderRadius: '50%' }}></div>
-                        )}
-                      </div>
-                      <div className="ms-3 overflow-hidden" style={{ flex: 1 }}>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <strong className="text-truncate" style={{ fontSize: '15px', color: 'var(--color-text-main)', fontWeight: 600 }}>{other.firstName} {other.lastName}</strong>
-                          {c.lastMessage && <small className="text-muted" style={{ fontSize: '12px' }}>{timeAgo(c.lastMessage.createdAt)}</small>}
-                        </div>
-                        <small className="text-muted text-truncate d-block" style={{ fontSize: '13px' }}>
-                          {c.lastMessage ? c.lastMessage.content : 'New conversation'}
-                        </small>
-                      </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-baseline mb-1">
+                      <span className="font-body-sm text-body-sm font-semibold text-on-surface truncate">{other.firstName} {other.lastName}</span>
+                      {c.lastMessage && <span className="font-label-mono text-label-mono text-on-surface-variant/70 text-[10px] shrink-0 ml-2">{timeAgo(c.lastMessage.createdAt)}</span>}
                     </div>
-                  );
-                })
-              )}
-            </div>
-          </Card>
+                    <p className={`font-body-sm text-body-sm truncate ${isActive ? 'text-on-surface-variant' : 'text-on-surface-variant/70'}`}>
+                      {c.lastMessage ? c.lastMessage.content : 'New conversation'}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
-
-        {/* Right Pane - Active Chat */}
-        <div className="col-md-8 h-100 d-flex flex-column">
-          <Card className="h-100 d-flex flex-column p-0 overflow-hidden" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-            {activeChatUser ? (
-              <>
-                <div className="p-3 border-bottom d-flex align-items-center" style={{ height: '70px', backgroundColor: 'var(--bg-card)' }}>
-                  <Link to={`/profile/${activeChatUser._id || activeChatUser.id}`} className="text-decoration-none d-flex align-items-center hover-opacity" style={{ color: 'var(--color-text-main)' }}>
-                    <div className="position-relative">
-                      <img src={activeChatUser.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${activeChatUser._id}`} alt="avatar" style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
-                      {onlineUsers.includes(activeChatUser._id || activeChatUser.id) && (
-                        <div style={{ position: 'absolute', bottom: '0', right: '0', width: '12px', height: '12px', backgroundColor: '#10b981', border: '2px solid #fff', borderRadius: '50%' }}></div>
-                      )}
+      </aside>
+      
+      {/* Right Column: Active Chat View */}
+      <section className={`flex-1 flex flex-col h-full z-10 relative ${!activeChatId ? 'hidden md:flex' : 'flex'}`}>
+        {activeChatUser ? (
+          <>
+            {/* Chat Header */}
+            <header className="h-16 px-md flex items-center justify-between border-b border-white/10 glass-panel shrink-0 bg-surface/50">
+              <div className="flex items-center gap-3">
+                <button className="md:hidden text-on-surface-variant mr-2" onClick={() => setActiveChatId(null)}>
+                  ←
+                </button>
+                <Link to={`/profile/${activeChatUser._id || activeChatUser.id}`} className="flex items-center gap-3 text-decoration-none group">
+                  <div className="relative shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center font-label-mono text-label-mono text-on-surface border border-white/10 overflow-hidden text-uppercase">
+                      {activeChatUser.avatar ? <img src={activeChatUser.avatar} className="w-full h-full object-cover" /> : <>{activeChatUser.firstName?.charAt(0)}{activeChatUser.lastName?.charAt(0)}</>}
                     </div>
-                    <strong className="ms-3 fs-5" style={{ fontWeight: 700, color: 'var(--color-text-main)', margin: 0 }}>{activeChatUser.firstName} {activeChatUser.lastName}</strong>
-                  </Link>
-                </div>
-
-                <div className="flex-grow-1 p-4 overflow-auto d-flex flex-column gap-3" style={{ backgroundColor: 'var(--bg-body)' }}>
-                  {messages.map((m, i) => {
-                    const isMine = m.senderId === user.id;
-                    return (
-                      <div key={m._id || i} className={`d-flex ${isMine ? 'justify-content-end' : 'justify-content-start'}`}>
-                        <div 
-                          className="px-4 py-2 d-flex flex-column"
-                          style={{ 
-                            maxWidth: '75%',
-                            backgroundColor: isMine ? 'var(--color-primary)' : 'var(--bg-card)',
-                            color: isMine ? '#ffffff' : 'var(--color-text-main)',
-                            fontSize: '15px',
-                            lineHeight: '1.5',
-                            borderRadius: isMine ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
-                            border: isMine ? 'none' : '1px solid var(--color-border)'
-                          }}
-                        >
-                          <div>{m.content}</div>
-                          {m.createdAt && (
-                            <small style={{ fontSize: '11px', marginTop: '4px', opacity: 0.8, textAlign: isMine ? 'right' : 'left' }}>
-                              {timeAgo(m.createdAt)}
-                            </small>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div ref={messagesEndRef} />
-                </div>
-
-                <div className="p-3 border-top" style={{ backgroundColor: 'var(--bg-card)' }}>
-                  <form onSubmit={sendMessage} className="d-flex gap-2 align-items-center">
-                    <input 
-                      type="text" 
-                      className="form-control flex-grow-1" 
-                      placeholder="Write a message..." 
-                      value={input}
-                      onChange={e => setInput(e.target.value)}
-                      style={{ borderRadius: '50px', padding: '12px 20px', border: '1px solid var(--color-border)', backgroundColor: 'var(--bg-body)' }}
-                    />
-                    <button type="submit" className="btn-h-primary" disabled={!input.trim()} style={{ borderRadius: '50px', padding: '12px 24px', fontWeight: 600 }}>
-                      Send
-                    </button>
-                  </form>
-                </div>
-              </>
-            ) : (
-              <div className="h-100 d-flex align-items-center justify-content-center text-muted flex-column" style={{ backgroundColor: 'var(--bg-card)' }}>
-                <div style={{ marginBottom: '24px', color: 'var(--color-border)' }}>
-                  <CiChat1 size={64} />
-                </div>
-                <h4 style={{ fontWeight: 700, color: 'var(--color-text-main)' }}>Your Messages</h4>
-                <p style={{ fontSize: '15px' }}>Select a conversation from the left to start chatting.</p>
+                    {onlineUsers.includes(activeChatUser._id || activeChatUser.id) && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#4ade80] rounded-full border-2 border-surface-container-low"></div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-body-sm text-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors">{activeChatUser.firstName} {activeChatUser.lastName}</h3>
+                    <p className="font-label-mono text-label-mono text-on-surface-variant/70 text-[10px]">{activeChatUser.headline || 'Member'}</p>
+                  </div>
+                </Link>
               </div>
-            )}
-          </Card>
-        </div>
-
-      </div>
+              <div className="flex gap-2">
+                <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors border border-transparent hover:border-white/10 text-on-surface-variant hover:text-on-surface">
+                  <CiMenuKebab size={20} />
+                </button>
+              </div>
+            </header>
+            
+            {/* Chat Messages Area */}
+            <div className="flex-1 overflow-y-auto p-md flex flex-col gap-sm">
+              {messages.map((m, i) => {
+                const isMine = m.senderId === user.id;
+                
+                return (
+                  <div key={m._id || i} className={`flex gap-3 max-w-[85%] ${isMine ? 'self-end' : 'self-start'}`}>
+                    {!isMine && (
+                      <div className="w-8 h-8 rounded-full bg-surface-container flex flex-shrink-0 items-center justify-center font-label-mono text-[10px] text-on-surface border border-white/10 mt-auto hidden md:flex overflow-hidden">
+                        {activeChatUser.avatar ? <img src={activeChatUser.avatar} className="w-full h-full object-cover" /> : <>{activeChatUser.firstName?.charAt(0)}</>}
+                      </div>
+                    )}
+                    <div className={`flex flex-col gap-1 ${isMine ? 'items-end' : 'items-start'}`}>
+                      <div className={`${isMine ? 'bg-primary-container text-on-primary-container rounded-2xl rounded-tr-sm rounded-br-sm shadow-[0_0_20px_rgba(220,20,60,0.15)] border-none' : 'bg-surface-container-low backdrop-blur-md border border-white/10 rounded-2xl rounded-bl-sm'} p-3 font-body-sm text-body-sm`}>
+                        {m.content}
+                      </div>
+                      <span className={`font-label-mono text-[10px] text-on-surface-variant/50 ${isMine ? 'mr-1' : 'ml-1'}`}>
+                        {m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </div>
+            
+            {/* Input Area */}
+            <div className="p-3 border-t border-white/10 bg-surface/50">
+              <form onSubmit={sendMessage} className="flex gap-2 items-center">
+                <input 
+                  type="text" 
+                  className="flex-grow bg-white/5 border border-white/10 rounded-full py-3 px-5 text-on-surface font-body-sm focus:border-primary outline-none transition-colors"
+                  placeholder="Message..." 
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                />
+                <button 
+                  type="submit" 
+                  disabled={!input.trim()} 
+                  className="bg-primary text-on-primary px-6 py-3 rounded-full font-bold font-label-mono disabled:opacity-50 transition-opacity"
+                >
+                  Send
+                </button>
+              </form>
+            </div>
+          </>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-on-surface-variant opacity-70">
+            <CiChat1 size={64} className="mb-4" />
+            <h4 className="font-headline-md font-bold text-on-surface mb-2">Your Messages</h4>
+            <p className="font-body-sm">Select a conversation from the left to start chatting.</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

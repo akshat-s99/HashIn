@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import api from '../api/axios'
-import Card from '../components/Card'
 import { useToast } from '../contexts/ToastContext'
-import { CiCamera, CiShuffle, CiLocationOn, CiBag1, CiBank } from 'react-icons/ci'
+import { CiCamera, CiShuffle, CiLocationOn, CiBag1, CiBank, CiStar, CiLink, CiSettings } from 'react-icons/ci'
 
 export default function ProfilePage() {
   const { addToast } = useToast()
@@ -11,31 +10,10 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
-  const fileInputRef = React.useRef(null)
+  const fileInputRef = useRef(null)
 
   const params = useParams()
   const isOwn = !params.userId
-
-  async function handleAvatarUpload(e) {
-    const file = e.target.files[0]
-    if (!file) return
-    setUploadingAvatar(true)
-    try {
-      const formData = new FormData()
-      formData.append('avatar', file)
-      const res = await api.post('/users/avatar', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      const updatedUser = res.data?.data?.user || res.data?.user || res.data
-      setProfile(updatedUser)
-      setForm(updatedUser)
-    } catch (error) {
-      console.error(error)
-      addToast('Failed to upload avatar', 'error')
-    } finally {
-      setUploadingAvatar(false)
-    }
-  }
 
   useEffect(() => {
     async function load() {
@@ -58,6 +36,27 @@ export default function ProfilePage() {
     }
     load()
   }, [params.userId])
+
+  async function handleAvatarUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploadingAvatar(true)
+    try {
+      const formData = new FormData()
+      formData.append('avatar', file)
+      const res = await api.post('/users/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      const updatedUser = res.data?.data?.user || res.data?.user || res.data
+      setProfile(updatedUser)
+      setForm(updatedUser)
+    } catch (error) {
+      console.error(error)
+      addToast('Failed to upload avatar', 'error')
+    } finally {
+      setUploadingAvatar(false)
+    }
+  }
 
   async function save() {
     try {
@@ -90,236 +89,260 @@ export default function ProfilePage() {
   }
 
   if (!profile) return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-      <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: 'var(--color-primary)' }} role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
+    <div className="flex justify-center items-center min-h-[60vh]">
+      <div className="w-8 h-8 border-2 border-white/20 border-t-primary rounded-full animate-spin"></div>
     </div>
   )
 
   if (editing) {
     return (
-      <div className="mx-auto" style={{ maxWidth: '800px' }}>
-        <Card style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-          <h3 className="mb-4" style={{ fontWeight: 700, color: 'var(--color-text-main)' }}>Edit Profile</h3>
+      <div className="w-full max-w-3xl mx-auto py-lg px-margin-mobile">
+        <div className="glass-panel rounded-xl p-md border border-white/10">
+          <h3 className="font-headline-md font-bold text-on-surface mb-xl">Edit Profile</h3>
           
-          <div className="d-flex flex-column flex-md-row align-items-md-center gap-4 mb-5 pb-4" style={{ borderBottom: '1px solid var(--color-border)' }}>
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <img src={form.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${form._id}`} alt="avatar" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--bg-card)', backgroundColor: 'var(--color-border)' }} />
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleAvatarUpload} 
-                accept="image/*" 
-                style={{ display: 'none' }} 
-              />
+          <div className="flex flex-col md:flex-row items-center gap-md mb-xl pb-md border-b border-white/10">
+            <div className="relative">
+              <div className="w-[100px] h-[100px] rounded-full bg-surface-container border-4 border-background overflow-hidden">
+                <img src={form.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${form._id}`} className="w-full h-full object-cover" />
+              </div>
+              <input type="file" ref={fileInputRef} onChange={handleAvatarUpload} accept="image/*" className="hidden" />
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="btn btn-primary rounded-circle shadow-sm"
-                style={{ position: 'absolute', bottom: '0', right: '0', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-primary)', border: '2px solid var(--bg-card)', color: '#fff' }}
+                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary border-2 border-background text-on-primary flex items-center justify-center disabled:opacity-50"
                 disabled={uploadingAvatar}
-                title="Upload new avatar"
               >
                 {uploadingAvatar ? '...' : <CiCamera size={16} />}
               </button>
             </div>
             <div>
-              <h5 style={{ fontWeight: 600, color: 'var(--color-text-main)', margin: '0 0 8px 0' }}>Profile Photo</h5>
-              <p style={{ margin: 0, fontSize: '14px', color: 'var(--color-text-muted)' }}>Upload a professional headshot.</p>
-              <button className="btn btn-sm mt-3 d-flex align-items-center" style={{ backgroundColor: 'var(--bg-body)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', fontWeight: 600, borderRadius: '50px', padding: '6px 16px' }} onClick={() => {
-                const seed = encodeURIComponent((form.firstName || 'User') + Math.random().toString(36).substring(7));
-                const newAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${seed}`;
-                setForm({...form, avatar: newAvatar});
-              }}>
-                <CiShuffle size={14} style={{ marginRight: '6px' }} />
-                Generate Random
+              <h5 className="font-body-lg font-bold text-on-surface mb-1">Profile Photo</h5>
+              <p className="font-body-sm text-on-surface-variant mb-3">Upload a professional headshot.</p>
+              <button 
+                className="flex items-center gap-xs px-4 py-1.5 rounded-full border border-white/10 text-on-surface text-[13px] hover:bg-white/5 transition-colors"
+                onClick={() => {
+                  const seed = encodeURIComponent((form.firstName || 'User') + Math.random().toString(36).substring(7));
+                  const newAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${seed}`;
+                  setForm({...form, avatar: newAvatar});
+                }}
+              >
+                <CiShuffle size={14} /> Generate Random
               </button>
             </div>
           </div>
 
-          <div className="row g-4 mb-4">
-            <div className="col-md-6">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>First Name</label>
-              <input className="form-control" placeholder="First Name" value={form.firstName || ''} onChange={e => setForm({...form, firstName: e.target.value})} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-md mb-lg">
+            <div className="flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">First Name</label>
+              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.firstName || ''} onChange={e => setForm({...form, firstName: e.target.value})} />
             </div>
-            <div className="col-md-6">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>Last Name</label>
-              <input className="form-control" placeholder="Last Name" value={form.lastName || ''} onChange={e => setForm({...form, lastName: e.target.value})} />
+            <div className="flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">Last Name</label>
+              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.lastName || ''} onChange={e => setForm({...form, lastName: e.target.value})} />
             </div>
-            <div className="col-12">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>Headline</label>
-              <input className="form-control" placeholder="E.g. Software Engineer at HashIn" value={form.headline || ''} onChange={e => setForm({...form, headline: e.target.value})} />
+            <div className="md:col-span-2 flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">Headline</label>
+              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.headline || ''} onChange={e => setForm({...form, headline: e.target.value})} placeholder="Software Engineer @ HashIn" />
             </div>
-            <div className="col-12">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>Location</label>
-              <input className="form-control" placeholder="E.g. San Francisco, CA" value={form.location || ''} onChange={e => setForm({...form, location: e.target.value})} />
+            <div className="md:col-span-2 flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">Location</label>
+              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.location || ''} onChange={e => setForm({...form, location: e.target.value})} placeholder="San Francisco, CA" />
             </div>
-            <div className="col-12">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>About</label>
-              <textarea className="form-control" placeholder="Tell us about yourself..." value={form.about || ''} onChange={e => setForm({...form, about: e.target.value})} style={{ minHeight: '120px' }} />
+            <div className="md:col-span-2 flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">About</label>
+              <textarea className="w-full p-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none h-24 resize-none" value={form.about || ''} onChange={e => setForm({...form, about: e.target.value})} placeholder="Tell us about yourself..." />
             </div>
-            <div className="col-12">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>Skills (comma separated)</label>
-              <input className="form-control" placeholder="React, Node.js, Design" value={Array.isArray(form.skills) ? form.skills.join(', ') : (form.skills || '')} onChange={e => setForm({...form, skills: e.target.value})} />
-            </div>
-          </div>
-          
-          <h4 className="mb-3 mt-5" style={{ fontWeight: 600, color: 'var(--color-text-main)', fontSize: '18px' }}>Social Links</h4>
-          <div className="row g-3 mb-4">
-            <div className="col-12">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>GitHub URL</label>
-              <input className="form-control" placeholder="https://github.com/username" value={form.links?.github || ''} onChange={e => handleLinkChange(e, 'github')} />
-            </div>
-            <div className="col-12">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>LinkedIn URL</label>
-              <input className="form-control" placeholder="https://linkedin.com/in/username" value={form.links?.linkedin || ''} onChange={e => handleLinkChange(e, 'linkedin')} />
-            </div>
-            <div className="col-12">
-              <label className="form-label" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>Portfolio URL</label>
-              <input className="form-control" placeholder="https://yourwebsite.com" value={form.links?.portfolio || ''} onChange={e => handleLinkChange(e, 'portfolio')} />
+            <div className="md:col-span-2 flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">Skills (comma separated)</label>
+              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={Array.isArray(form.skills) ? form.skills.join(', ') : (form.skills || '')} onChange={e => setForm({...form, skills: e.target.value})} placeholder="React, Node.js, Go" />
             </div>
           </div>
           
-          <div className="d-flex justify-content-end align-items-center mt-5 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
-            <div className="d-flex gap-3">
-              <button className="btn-h-light" onClick={() => setEditing(false)}>Cancel</button>
-              <button className="btn-h-primary" onClick={save}>Save Changes</button>
+          <h4 className="font-headline-sm font-bold text-on-surface mb-md">Social Links</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-md mb-xl">
+            <div className="flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">GitHub</label>
+              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.links?.github || ''} onChange={e => handleLinkChange(e, 'github')} />
+            </div>
+            <div className="flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">LinkedIn</label>
+              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.links?.linkedin || ''} onChange={e => handleLinkChange(e, 'linkedin')} />
+            </div>
+            <div className="flex flex-col gap-xs">
+              <label className="font-label-mono text-on-surface-variant">Portfolio</label>
+              <input className="w-full h-10 px-sm bg-surface border border-white/10 rounded-lg text-on-surface focus:border-primary outline-none" value={form.links?.portfolio || ''} onChange={e => handleLinkChange(e, 'portfolio')} />
             </div>
           </div>
-        </Card>
+          
+          <div className="flex justify-end gap-sm pt-md border-t border-white/10">
+            <button className="px-6 py-2 rounded-full border border-white/10 hover:bg-white/5 text-on-surface transition-colors font-bold" onClick={() => setEditing(false)}>Cancel</button>
+            <button className="px-6 py-2 rounded-full bg-primary-container text-on-primary-container hover:bg-primary transition-colors font-bold" onClick={save}>Save Changes</button>
+          </div>
+        </div>
       </div>
     )
   }
 
+  const skillsArr = Array.isArray(profile.skills) ? profile.skills : (profile.skills ? profile.skills.split(',').map(s => s.trim()) : [])
+
   return (
-    <div className="mx-auto" style={{ maxWidth: '800px' }}>
-      <div className="card p-0 mb-4 overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--color-border)', boxShadow: 'none' }}>
-        <div className="profile-banner" style={{ height: '160px', backgroundColor: '#e2e8f0', backgroundImage: 'url(https://images.unsplash.com/photo-1557683311-eac922347aa1?auto=format&fit=crop&w=800&q=80)', backgroundSize: 'cover' }}></div>
-        <div className="px-4 pb-4 position-relative">
-          <div style={{ display: 'inline-block', position: 'relative', marginTop: '-65px', zIndex: 10 }}>
-            <img src={profile.avatar} alt="avatar" className="shadow-sm" onError={e => { e.target.onerror = null; e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${profile._id}` }} style={{ width: '130px', height: '130px', borderRadius: '50%', border: '4px solid var(--bg-card)', backgroundColor: 'var(--bg-card)', objectFit: 'cover', display: 'block' }} />
-            {isOwn && (
-              <>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleAvatarUpload} 
-                  accept="image/*" 
-                  style={{ display: 'none' }} 
-                />
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="btn btn-primary rounded-circle shadow"
-                  style={{ position: 'absolute', bottom: '4px', right: '4px', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-primary)', border: '3px solid var(--bg-card)', color: '#fff' }}
-                  disabled={uploadingAvatar}
-                  title="Upload new avatar"
-                >
-                  {uploadingAvatar ? '...' : <CiCamera size={18} />}
-                </button>
-              </>
-            )}
+    <div className="w-full">
+      {/* Profile Header Section */}
+      <div className="relative w-full">
+        {/* Banner Gradient */}
+        <div className="h-[200px] w-full bg-gradient-to-r from-surface-container-high via-surface-container to-surface-container-high border-b border-white/5 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, #dc143c 0%, transparent 50%), radial-gradient(circle at 80% 30%, #414a53 0%, transparent 40%)'}}></div>
+          <div className="absolute inset-0" style={{backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
+        </div>
+        
+        {/* Profile Info Container */}
+        <div className="max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop relative">
+          {/* Avatar (Overlapping) */}
+          <div className="absolute -top-16 left-margin-mobile md:left-margin-desktop">
+            <div className="w-[130px] h-[130px] rounded-full bg-surface border-4 border-background flex items-center justify-center relative overflow-hidden">
+              <img src={profile.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${profile._id}`} alt="avatar" className="w-full h-full object-cover bg-surface-container-high" />
+              {/* Status indicator */}
+              <div className="absolute bottom-2 right-2 w-4 h-4 bg-tertiary rounded-full border-2 border-background"></div>
+            </div>
           </div>
-          <div className="mt-3">
-            <h3 style={{ fontSize: '26px', fontWeight: 700, color: 'var(--color-text-main)', margin: 0 }}>
-              {profile.firstName} {profile.lastName}
-            </h3>
-            <div className="text-muted" style={{ fontSize: '16px', marginTop: '6px', marginBottom: '8px', lineHeight: 1.4 }}>
-              {profile.headline || 'No headline provided'}
-            </div>
-            {profile.location && (
-              <div className="text-muted mb-2" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <CiLocationOn size={14} />
-                {profile.location}
+          
+          {/* Header Actions & Info */}
+          <div className="pt-20 pb-lg flex flex-col md:flex-row md:justify-between md:items-start gap-md border-b border-white/10">
+            <div>
+              <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-1">{profile.firstName} {profile.lastName}</h1>
+              <p className="font-body-lg text-body-lg text-on-surface-variant mb-2">{profile.headline || 'No headline provided'}</p>
+              <div className="flex items-center gap-xs text-on-surface-variant font-label-mono text-label-mono mb-4">
+                {profile.location && (
+                  <>
+                    <span className="text-[16px]"><CiLocationOn /></span>
+                    <span>{profile.location}</span>
+                    <span className="mx-2 opacity-30">|</span>
+                  </>
+                )}
+                {profile.links?.github && (
+                  <>
+                    <span className="text-[16px]"><CiLink /></span>
+                    <a className="hover:text-primary transition-colors text-decoration-none text-on-surface-variant" href={profile.links.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <span className="mx-2 opacity-30">|</span>
+                  </>
+                )}
+                {profile.links?.linkedin && (
+                  <>
+                    <span className="text-[16px]"><CiLink /></span>
+                    <a className="hover:text-primary transition-colors text-decoration-none text-on-surface-variant" href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                  </>
+                )}
               </div>
-            )}
-            
-            <div className="d-flex gap-3 mb-3">
-              {profile.links?.github && <a href={profile.links.github} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)' }}>GitHub</a>}
-              {profile.links?.linkedin && <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)' }}>LinkedIn</a>}
-              {profile.links?.portfolio && <a href={profile.links.portfolio} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)' }}>Portfolio</a>}
             </div>
-            
-            <div className="d-flex gap-2 mt-2">
+            <div className="flex gap-sm">
               {isOwn ? (
-                <button className="btn-h-primary" onClick={() => setEditing(true)} style={{ borderRadius: '50px', fontWeight: 600, padding: '8px 24px' }}>Edit Profile</button>
+                <button onClick={() => setEditing(true)} className="h-[40px] px-lg rounded-full border border-white/10 bg-transparent text-on-surface font-body-sm text-body-sm glass-panel hover:bg-white/5 transition-colors active:scale-95">
+                  Edit Profile
+                </button>
               ) : (
-                <button className="btn-h-primary" onClick={sendConnectionRequest} style={{ borderRadius: '50px', fontWeight: 600, padding: '8px 24px' }}>Connect</button>
+                <button onClick={sendConnectionRequest} className="h-[40px] px-lg rounded-full border border-primary/20 bg-primary/10 text-primary font-body-sm text-body-sm hover:bg-primary hover:text-on-primary transition-colors active:scale-95">
+                  Connect
+                </button>
               )}
             </div>
           </div>
         </div>
       </div>
-
-      <div className="row">
-        <div className="col-md-8">
-          <Card className="mb-4" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-            <h4 className="mb-3" style={{ fontWeight: 600, color: 'var(--color-text-main)' }}>About</h4>
-            <p style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', fontSize: '15px', color: 'var(--color-text-main)', margin: 0 }}>{profile.about || 'No about information provided.'}</p>
-          </Card>
-
-          <Card className="mb-4" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h4 className="m-0" style={{ fontWeight: 600, color: 'var(--color-text-main)' }}>Experience</h4>
+      
+      {/* Bento Grid Layout for Content */}
+      <div className="max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop py-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+          {/* Left Column: Skills & Info (4 cols) */}
+          <div className="lg:col-span-4 flex flex-col gap-gutter">
+            {/* Skills Card */}
+            <div className="glass-panel rounded-xl p-md border border-white/10">
+              <h2 className="font-headline-md text-headline-md text-on-surface mb-4 pb-2 border-b border-white/5 flex items-center gap-xs">
+                <span className="text-primary"><CiStar /></span>
+                Skills
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {skillsArr.length > 0 ? skillsArr.map(s => (
+                  <span key={s} className="font-code-block text-code-block px-3 py-1 rounded-full border border-white/10 bg-surface-container-high text-on-surface">{s}</span>
+                )) : <span className="text-on-surface-variant font-body-sm">No skills added yet.</span>}
+              </div>
             </div>
-            {profile.experience && profile.experience.length > 0 ? (
-              <div className="d-flex flex-column gap-4">
-                {profile.experience.map((exp, idx) => (
-                  <div key={idx} className="d-flex gap-3">
-                    <div style={{ width: '48px', height: '48px', backgroundColor: 'var(--color-overlay)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
-                      <CiBag1 size={24} />
-                    </div>
-                    <div>
-                      <h5 style={{ margin: 0, fontWeight: 600, fontSize: '16px', color: 'var(--color-text-main)' }}>{exp.title}</h5>
-                      <div style={{ fontSize: '14px', color: 'var(--color-text-main)' }}>{exp.company}</div>
-                      <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</div>
-                      {exp.description && <p className="mt-2 mb-0" style={{ fontSize: '14px', color: 'var(--color-text-main)', whiteSpace: 'pre-wrap' }}>{exp.description}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted m-0">No experience added yet.</p>
-            )}
-          </Card>
-
-          <Card className="mb-4" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h4 className="m-0" style={{ fontWeight: 600, color: 'var(--color-text-main)' }}>Education</h4>
+            
+            {/* About Card */}
+            <div className="glass-panel rounded-xl p-md border border-white/10">
+              <h2 className="font-headline-md text-headline-md text-on-surface mb-4 pb-2 border-b border-white/5 flex items-center gap-xs">
+                <span className="text-primary"><CiSettings /></span>
+                About
+              </h2>
+              <p className="font-body-sm text-on-surface-variant whitespace-pre-wrap leading-relaxed">
+                {profile.about || 'No about information provided.'}
+              </p>
             </div>
-            {profile.education && profile.education.length > 0 ? (
-              <div className="d-flex flex-column gap-4">
-                {profile.education.map((edu, idx) => (
-                  <div key={idx} className="d-flex gap-3">
-                    <div style={{ width: '48px', height: '48px', backgroundColor: 'var(--color-overlay)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
-                      <CiBank size={24} />
+          </div>
+          
+          {/* Right Column: Experience (8 cols) */}
+          <div className="lg:col-span-8 flex flex-col gap-gutter">
+            {/* Experience Card */}
+            <div className="glass-panel rounded-xl p-md border border-white/10">
+              <h2 className="font-headline-md text-headline-md text-on-surface mb-6 pb-2 border-b border-white/5 flex items-center gap-xs">
+                <span className="text-primary"><CiBag1 /></span>
+                Experience
+              </h2>
+              <div className="flex flex-col gap-lg">
+                {profile.experience && profile.experience.length > 0 ? (
+                  profile.experience.map((exp, idx) => (
+                    <div key={idx} className="relative pl-8">
+                      {/* Timeline line */}
+                      {idx !== profile.experience.length - 1 && (
+                        <div className="absolute left-3 top-8 bottom-[-24px] w-px bg-white/10"></div>
+                      )}
+                      {/* Timeline node */}
+                      <div className="absolute left-1.5 top-1.5 w-3 h-3 rounded-full bg-primary ring-4 ring-surface-container-high"></div>
+                      
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
+                        <div>
+                          <h3 className="font-body-lg text-body-lg font-bold text-on-surface mb-1">{exp.title}</h3>
+                          <div className="font-label-mono text-label-mono text-primary mb-2">{exp.company}</div>
+                        </div>
+                        <div className="font-label-mono text-label-mono text-on-surface-variant bg-white/5 px-2 py-1 rounded border border-white/10 inline-block self-start">
+                          {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                        </div>
+                      </div>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                        {exp.description}
+                      </p>
                     </div>
-                    <div>
-                      <h5 style={{ margin: 0, fontWeight: 600, fontSize: '16px', color: 'var(--color-text-main)' }}>{edu.school}</h5>
-                      <div style={{ fontSize: '14px', color: 'var(--color-text-main)' }}>{edu.degree}{edu.fieldOfStudy ? `, ${edu.fieldOfStudy}` : ''}</div>
-                      <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>{edu.startDate} - {edu.endDate}</div>
+                  ))
+                ) : (
+                  <p className="text-on-surface-variant font-body-sm">No experience added yet.</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Education Card */}
+            <div className="glass-panel rounded-xl p-md border border-white/10">
+              <h2 className="font-headline-md text-headline-md text-on-surface mb-6 pb-2 border-b border-white/5 flex items-center gap-xs">
+                <span className="text-primary"><CiBank /></span>
+                Education
+              </h2>
+              <div className="flex flex-col gap-md">
+                {profile.education && profile.education.length > 0 ? (
+                  profile.education.map((edu, idx) => (
+                    <div key={idx} className="flex gap-4 items-start p-sm rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+                      <div className="w-12 h-12 rounded-lg bg-surface-container-high border border-white/10 flex items-center justify-center text-on-surface-variant flex-shrink-0">
+                        <CiBank size={24} />
+                      </div>
+                      <div>
+                        <h3 className="font-body-lg text-body-lg font-bold text-on-surface mb-1">{edu.school}</h3>
+                        <div className="font-body-sm text-body-sm text-on-surface-variant mb-1">{edu.degree}{edu.fieldOfStudy ? `, ${edu.fieldOfStudy}` : ''}</div>
+                        <div className="font-label-mono text-label-mono text-on-surface-variant opacity-70">{edu.startDate} - {edu.endDate}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-on-surface-variant font-body-sm">No education added yet.</p>
+                )}
               </div>
-            ) : (
-              <p className="text-muted m-0">No education added yet.</p>
-            )}
-          </Card>
-
-          <Card className="mb-4" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-            <h4 className="mb-4" style={{ fontWeight: 600, color: 'var(--color-text-main)' }}>Skills</h4>
-            {profile.skills && profile.skills.length > 0 ? (
-              <div className="d-flex flex-wrap gap-2">
-                {profile.skills.map(s => (
-                  <span key={s} style={{ backgroundColor: 'var(--bg-body)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', padding: '6px 16px', borderRadius: '50px', fontSize: '14px', fontWeight: 600 }}>
-                    {s}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted m-0">No skills added yet.</p>
-            )}
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

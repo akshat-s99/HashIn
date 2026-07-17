@@ -4,9 +4,7 @@ import api from '../api/axios'
 import CreatePost from '../components/CreatePost'
 import PostCard from '../components/PostCard'
 import { useAuth } from '../contexts/AuthContext'
-import Card from '../components/Card'
-import Avatar from '../components/Avatar'
-import { CiBookmark, CiSettings, CiMonitor } from 'react-icons/ci'
+import { CiMonitor } from 'react-icons/ci'
 
 export default function Feed() {
   const { user } = useAuth()
@@ -47,125 +45,97 @@ export default function Feed() {
   }
 
   return (
-    <div className="container-fluid" style={{ maxWidth: '1128px', paddingTop: '24px' }}>
-      <div className="row">
-        {/* Left Sidebar */}
-        <div className="col-lg-3 d-none d-lg-block">
-          <div className="sticky-sidebar">
-            <div className="card-minimal d-flex flex-column align-items-center text-center p-4 mb-4">
-              <img 
-                src={user?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${user?._id}`} 
-                alt="avatar" 
-                style={{ width: '80px', height: '80px', borderRadius: '50%', border: '2px solid var(--color-border)', objectFit: 'cover', marginBottom: '16px' }} 
-              />
-              <h5 style={{ fontWeight: 600, margin: 0, color: 'var(--color-text-main)', fontSize: '16px' }}>
-                {user?.firstName} {user?.lastName}
-              </h5>
-              <div style={{ fontSize: '13px', color: 'var(--color-text-muted)', marginTop: '6px', lineHeight: 1.4 }}>
-                {user?.headline || 'Professional at HashIn'}
-              </div>
-            </div>
-            
-            <div className="card-minimal p-3 mb-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-muted)' }}>Connections</span>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-main)' }}>{user?.connectionsCount || 0}</span>
-              </div>
-              <div className="d-flex justify-content-between align-items-center">
-                <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-muted)' }}>Projects</span>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-main)' }}>{user?.projectsCount || 0}</span>
-              </div>
-            </div>
+    <>
+      {/* Center Column (Feed) */}
+      <div className="w-full max-w-[680px] py-md flex flex-col gap-md">
+        <CreatePost onPosted={handlePosted} />
 
-            <div className="card-minimal p-2">
-              <Link to="/saved" className="d-flex align-items-center gap-3 p-2 text-decoration-none" style={{ borderRadius: '8px', color: 'var(--color-text-main)', transition: 'background-color 0.2s ease' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--color-overlay-hover)'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                <CiBookmark size={18} style={{ color: 'var(--color-text-muted)' }} />
-                <span style={{ fontSize: '14px', fontWeight: 500 }}>Saved Posts</span>
-              </Link>
-
-              <Link to="/settings" className="d-flex align-items-center gap-3 p-2 text-decoration-none" style={{ borderRadius: '8px', color: 'var(--color-text-main)', transition: 'background-color 0.2s ease' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--color-overlay-hover)'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                <CiSettings size={18} style={{ color: 'var(--color-text-muted)' }} />
-                <span style={{ fontSize: '14px', fontWeight: 500 }}>Settings</span>
-              </Link>
-            </div>
-          </div>
+        {/* Filter Tabs */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+          <button className="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-label-mono text-label-mono whitespace-nowrap">For You</button>
+          <button className="px-4 py-1.5 rounded-full bg-transparent border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-label-mono text-label-mono whitespace-nowrap">Projects</button>
+          <button className="px-4 py-1.5 rounded-full bg-transparent border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-label-mono text-label-mono whitespace-nowrap">Questions</button>
+          <button className="px-4 py-1.5 rounded-full bg-transparent border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-label-mono text-label-mono whitespace-nowrap">Achievements</button>
         </div>
 
-        {/* Center Column */}
-        <div className="col-12 col-lg-9">
-          <CreatePost onPosted={handlePosted} />
-
-          <div className="mb-4 d-flex align-items-center gap-3 overflow-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="segmented-control flex-shrink-0" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--bg-body)' }}>
-              <button className="btn active">For You</button>
-              <button className="btn">Projects</button>
-              <button className="btn">Questions</button>
-              <button className="btn">Learning</button>
-              <button className="btn">Achievements</button>
+        {posts.length === 0 && !loading ? (
+          <div className="glass-panel text-center py-5 border border-white/10 rounded-xl flex flex-col items-center">
+            <div className="text-on-surface-variant mb-4 opacity-50">
+              <CiMonitor size={48} />
             </div>
-            <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)', minWidth: '20px' }}></div>
+            <p className="font-body-lg text-body-lg text-on-surface mb-2">Your feed is empty.</p>
+            <Link to="/discover" className="text-primary font-bold hover:underline">Discover people</Link>
           </div>
-
-          {posts.length === 0 && !loading ? (
-            <Card className="text-center py-5" style={{ border: '1px solid var(--color-border)', boxShadow: 'none' }}>
-              <div style={{ marginBottom: '16px', color: 'var(--color-border)' }}>
-                <CiMonitor size={48} />
-              </div>
-              Your feed is empty.<br/>
-              <Link to="/discover" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>Discover people</Link>
-            </Card>
-          ) : (
-            <div className="d-flex flex-column gap-3">
-              {posts.map((p, index) => (
-                <React.Fragment key={p._id || p.id}>
-                  <PostCard post={p} onLike={handleLikeUpdate} onDelete={handlePostDelete} />
-                  {index === 2 && (
-                    <div className="card-minimal py-4 px-0">
-                      <div className="px-4 mb-3 d-flex justify-content-between align-items-center">
-                        <h6 style={{ fontWeight: 600, color: 'var(--color-text-main)', margin: 0, fontSize: '14px' }}>Suggested Developers</h6>
-                        <Link to="/discover" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none' }}>View all</Link>
-                      </div>
-                      <div className="d-flex gap-3 px-4 overflow-auto pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                        {[1, 2, 3, 4].map(i => (
-                          <div key={i} className="text-center p-3 flex-shrink-0" style={{ width: '160px', border: '1px solid var(--color-border)', borderRadius: '12px', backgroundColor: 'var(--bg-body)' }}>
-                            <img src={`https://api.dicebear.com/7.x/initials/svg?seed=dev${i}`} alt="avatar" style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', marginBottom: '12px' }} />
-                            <div className="text-truncate" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>Developer {i}</div>
-                            <div className="text-truncate" style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '12px' }}>Software Engineer</div>
-                            <button className="btn w-100" style={{ fontSize: '13px', padding: '6px', borderRadius: '6px', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', fontWeight: 500, backgroundColor: 'transparent', transition: 'background-color 0.2s ease' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--color-overlay-hover)'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>Connect</button>
-                          </div>
-                        ))}
-                      </div>
+        ) : (
+          <div className="flex flex-col gap-sm">
+            {posts.map((p, index) => (
+              <React.Fragment key={p._id || p.id}>
+                <PostCard post={p} onLike={handleLikeUpdate} onDelete={handlePostDelete} />
+                {index === 2 && (
+                  <div className="glass-panel py-4 px-0 border border-white/10 rounded-xl">
+                    <div className="px-4 mb-3 flex justify-between items-center">
+                      <h6 className="font-body-sm font-bold text-on-surface m-0">Suggested Developers</h6>
+                      <Link to="/discover" className="text-[13px] font-bold text-primary text-decoration-none hover:underline">View all</Link>
                     </div>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          )}
+                    <div className="flex gap-3 px-4 overflow-auto pb-2 no-scrollbar">
+                      {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="text-center p-3 flex-shrink-0 w-[160px] border border-white/10 rounded-xl bg-surface/50">
+                          <div className="w-14 h-14 mx-auto rounded-full bg-surface-container flex items-center justify-center mb-3">
+                             <img src={`https://api.dicebear.com/7.x/initials/svg?seed=dev${i}`} className="w-full h-full rounded-full object-cover" />
+                          </div>
+                          <div className="truncate font-body-sm font-bold text-on-surface">Developer {i}</div>
+                          <div className="truncate text-[12px] text-on-surface-variant mb-3">Software Engineer</div>
+                          <button className="w-full text-[13px] p-1.5 rounded-md border border-white/10 text-on-surface font-medium hover:bg-white/5 transition-colors">Connect</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
 
-          {hasMore && (
-            <div 
-              className="d-flex justify-content-center mt-4 mb-5" 
-              ref={el => {
-                if (el && !loading && hasMore) {
-                  const observer = new IntersectionObserver(
-                    entries => {
-                      if (entries[0].isIntersecting) {
-                        load(page + 1)
-                      }
-                    },
-                    { threshold: 0.5 }
-                  )
-                  observer.observe(el)
-                }
-              }}
-            >
-              <button className="btn-action-minimal" onClick={() => load(page + 1)} disabled={loading} style={{ borderRadius: '50px', padding: '8px 24px', border: '1px solid var(--color-border)' }}>
-                {loading ? 'Loading...' : 'Load More'}
-              </button>
-            </div>
-          )}
-        </div>
+        {hasMore && (
+          <div 
+            className="flex justify-center mt-4 mb-5" 
+            ref={el => {
+              if (el && !loading && hasMore) {
+                const observer = new IntersectionObserver(
+                  entries => {
+                    if (entries[0].isIntersecting) {
+                      load(page + 1)
+                    }
+                  },
+                  { threshold: 0.5 }
+                )
+                observer.observe(el)
+              }
+            }}
+          >
+            <button className="rounded-full px-6 py-2 border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-label-mono" onClick={() => load(page + 1)} disabled={loading}>
+              {loading ? 'Loading...' : 'Load More'}
+            </button>
+          </div>
+        )}
       </div>
-    </div>
+
+      {/* Right Sidebar (Suggested) */}
+      <aside className="hidden xl:flex w-[280px] p-md flex-col gap-md">
+        <div className="glass-panel rounded-xl p-md border border-white/10">
+          <h3 className="font-body-sm font-bold text-on-surface mb-sm border-b border-white/10 pb-xs">Trending Topics</h3>
+          <div className="flex flex-col gap-sm">
+            <a className="group" href="#">
+              <div className="font-label-mono text-on-surface-variant mb-1 group-hover:text-primary transition-colors">#rustlang</div>
+              <div className="font-body-sm text-on-surface">Memory safety in embedded systems</div>
+            </a>
+            <a className="group" href="#">
+              <div className="font-label-mono text-on-surface-variant mb-1 group-hover:text-primary transition-colors">#architecture</div>
+              <div className="font-body-sm text-on-surface">Event-driven vs Polling</div>
+            </a>
+          </div>
+        </div>
+      </aside>
+    </>
   )
 }

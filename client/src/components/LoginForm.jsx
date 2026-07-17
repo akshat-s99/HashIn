@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
-import { useToast } from '../contexts/ToastContext'
+import { CiMail, CiLock, CiCircleCheck } from 'react-icons/ci'
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')
@@ -9,7 +9,6 @@ export default function LoginForm() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
-  const { addToast } = useToast()
   const navigate = useNavigate()
 
   async function handleSubmit(e) {
@@ -27,42 +26,66 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {error && <div className="alert alert-danger p-2 small text-center" style={{ borderRadius: '16px' }}>{error}</div>}
-      
-      <div className="mb-3">
-        <label className="form-label" style={{ fontSize: '14px', fontWeight: 500, paddingLeft: '4px', color: 'var(--color-text-main)' }}>Email</label>
-        <input className="form-control rounded-pill" type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required style={{ padding: '14px 20px', border: '2px solid var(--color-border)', backgroundColor: 'transparent', color: 'var(--color-text-main)' }} />
-      </div>
-      <div className="mb-4">
-        <label className="form-label" style={{ fontSize: '14px', fontWeight: 500, paddingLeft: '4px', color: 'var(--color-text-main)' }}>Password</label>
-        <input className="form-control rounded-pill" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required style={{ padding: '14px 20px', border: '2px solid var(--color-border)', backgroundColor: 'transparent', color: 'var(--color-text-main)' }} />
+    <div className="w-full max-w-sm flex flex-col gap-lg z-10">
+      <div className="flex flex-col gap-xs text-left">
+        <h2 className="font-headline-lg text-headline-lg md:text-headline-lg text-on-surface">Welcome back</h2>
+        <p className="font-body-sm text-body-sm text-on-surface-variant">Sign in to your HashIn account</p>
       </div>
 
-      <div className="text-start mb-4 px-2">
-        <Link to="/forgot-password" className="text-decoration-none" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>Forgot your password?</Link>
+      <form className="flex flex-col gap-md" onSubmit={handleSubmit}>
+        {error && <div className="p-sm text-error bg-error-container/20 border border-error/50 rounded-lg font-body-sm text-center">{error}</div>}
+        
+        <div className="flex flex-col gap-sm">
+          <div className="relative">
+            <span className="absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm"><CiMail /></span>
+            <input 
+              className="w-full h-[50px] pl-10 pr-sm bg-surface border border-white/10 rounded-lg text-on-surface font-code-block focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/50 transition-colors outline-none" 
+              id="email" type="email" placeholder="Email address" required 
+              value={email} onChange={e => setEmail(e.target.value)} 
+            />
+          </div>
+          <div className="relative">
+            <span className="absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm"><CiLock /></span>
+            <input 
+              className="w-full h-[50px] pl-10 pr-sm bg-surface border border-white/10 rounded-lg text-on-surface font-code-block focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/50 transition-colors outline-none" 
+              id="password" type="password" placeholder="Password" required 
+              value={password} onChange={e => setPassword(e.target.value)} 
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-xs cursor-pointer group">
+            <div className="relative flex items-center justify-center w-4 h-4 rounded-sm border border-white/20 bg-surface-container group-hover:border-primary/50 transition-colors">
+              <input className="peer opacity-0 absolute w-full h-full cursor-pointer" type="checkbox" />
+              <span className="text-[12px] text-primary opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"><CiCircleCheck /></span>
+            </div>
+            <span className="font-label-mono text-label-mono text-on-surface-variant group-hover:text-on-surface transition-colors">Remember me</span>
+          </label>
+          <Link to="/forgot-password" className="font-label-mono text-label-mono text-primary hover:text-primary-fixed transition-colors">Forgot password?</Link>
+        </div>
+
+        <button 
+          className="w-full h-[50px] rounded-full bg-primary-container text-on-primary-container font-body-sm text-body-sm font-semibold hover:bg-inverse-primary transition-colors active:scale-[0.98] disabled:opacity-50" 
+          type="submit" disabled={loading}
+        >
+          {loading ? 'Signing In...' : 'Sign In'}
+        </button>
+      </form>
+
+      <div className="relative flex items-center py-sm">
+        <div className="flex-grow border-t border-white/10"></div>
+        <span className="flex-shrink-0 mx-sm font-label-mono text-label-mono text-on-surface-variant uppercase tracking-wider">or</span>
+        <div className="flex-grow border-t border-white/10"></div>
       </div>
 
-      <button className="w-100 mb-4" type="submit" disabled={loading} style={{ backgroundColor: '#e60023', color: '#fff', border: 'none', borderRadius: '24px', padding: '14px', fontSize: '16px', fontWeight: 600, transition: 'background-color 0.2s' }} onMouseOver={(e) => !loading && (e.target.style.backgroundColor = '#ad081b')} onMouseOut={(e) => !loading && (e.target.style.backgroundColor = '#e60023')}>
-        {loading ? 'Logging in...' : 'Log in'}
+      <button className="w-full h-[50px] rounded-full border border-white/10 bg-transparent text-on-surface font-body-sm text-body-sm hover:bg-white/5 transition-colors flex items-center justify-center gap-sm active:scale-[0.98]" type="button">
+        Continue with GitHub
       </button>
 
-      <div className="d-flex align-items-center mb-4">
-        <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }}></div>
-        <div className="px-3 text-muted" style={{ fontSize: '12px', fontWeight: 600 }}>OR</div>
-        <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }}></div>
-      </div>
-
-      <button type="button" onClick={() => addToast("Google Authentication coming soon!", "info")} className="btn w-100 d-flex align-items-center justify-content-center gap-2 mb-4" style={{ borderRadius: '50px', padding: '12px', fontSize: '16px', border: '2px solid var(--color-border)', color: 'var(--color-text-main)', fontWeight: 600, backgroundColor: 'transparent', transition: 'background-color 0.2s' }} onMouseOver={(e) => e.target.style.backgroundColor = 'var(--color-overlay-hover)'} onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G" style={{ width: '20px', height: '20px' }} />
-        Continue with Google
-      </button>
-      
-      <div className="text-center mt-3">
-        <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
-          Not on HashIn yet? <Link to="/register" style={{ color: 'var(--color-text-main)', fontWeight: 600, textDecoration: 'none' }}>Sign up</Link>
-        </span>
-      </div>
-    </form>
+      <p className="text-center font-body-sm text-body-sm text-on-surface-variant mt-sm">
+        Don't have an account? <Link to="/register" className="text-primary hover:underline underline-offset-4">Sign up</Link>
+      </p>
+    </div>
   )
 }

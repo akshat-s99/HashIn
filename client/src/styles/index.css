@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 /* System fonts prioritized to use SF Pro */
 :root, [data-theme="light"] {
   --bg-body: #f9fafb;

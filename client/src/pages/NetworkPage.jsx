@@ -2,28 +2,27 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import { useAuth } from '../contexts/AuthContext'
-import Card from '../components/Card'
 import { CiMail, CiUser } from 'react-icons/ci'
 
 function UserRow({ user, onAccept, onReject, onRemove, itemId }) {
   if (!user) return null;
   return (
-    <Card className="mb-3" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', padding: '16px 20px', borderRadius: '12px' }}>
-      <div className="d-flex align-items-center justify-content-between">
-        <Link to={`/profile/${user._id}`} className="d-flex align-items-center text-decoration-none" style={{ color: 'var(--color-text-main)' }}>
-          <img src={user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${user._id}`} alt="avatar" className="me-3" style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '50%', border: '1px solid var(--color-border)' }} />
-          <div>
-            <strong style={{ fontSize: '16px', color: 'var(--color-text-main)', fontWeight: 600 }}>{user.firstName} {user.lastName}</strong>
-            <div className="text-muted mt-1" style={{ fontSize: '14px', lineHeight: 1.3 }}>{user.headline || 'HashIn Member'}</div>
-          </div>
-        </Link>
-        <div className="d-flex gap-2">
-          {onAccept && <button className="btn-h-primary" onClick={() => onAccept(itemId)} style={{ borderRadius: '50px', padding: '6px 20px', fontWeight: 600, fontSize: '14px' }}>Accept</button>}
-          {onReject && <button className="btn btn-sm" onClick={() => onReject(itemId)} style={{ backgroundColor: 'var(--color-border)', color: 'var(--color-text-main)', borderRadius: '50px', padding: '6px 20px', fontWeight: 600, fontSize: '14px', border: '1px solid var(--color-border)' }}>Ignore</button>}
-          {onRemove && <button className="btn btn-sm" onClick={() => onRemove(itemId)} style={{ backgroundColor: 'var(--bg-card)', color: '#dc2626', borderRadius: '50px', padding: '6px 20px', fontWeight: 600, fontSize: '14px', border: '1px solid #fca5a5' }}>Remove</button>}
+    <div className="glass-panel p-4 mb-3 border border-white/10 rounded-xl flex items-center justify-between">
+      <Link to={`/profile/${user._id}`} className="flex items-center text-decoration-none group flex-1 min-w-0">
+        <div className="w-12 h-12 rounded-full bg-surface-container border border-white/10 flex-shrink-0 flex items-center justify-center font-label-mono text-label-mono text-on-surface text-uppercase overflow-hidden mr-3">
+          {user.avatar ? <img src={user.avatar} className="w-full h-full object-cover" /> : <>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</>}
         </div>
+        <div className="min-w-0 pr-3">
+          <strong className="block text-[16px] text-on-surface font-bold truncate group-hover:text-primary transition-colors">{user.firstName} {user.lastName}</strong>
+          <div className="text-on-surface-variant mt-1 text-[13px] truncate">{user.headline || 'HashIn Member'}</div>
+        </div>
+      </Link>
+      <div className="flex gap-2 flex-shrink-0">
+        {onAccept && <button className="bg-primary text-on-primary rounded-full px-4 py-1.5 font-bold text-[13px] hover:bg-primary/90 transition-colors" onClick={() => onAccept(itemId)}>Accept</button>}
+        {onReject && <button className="border border-white/10 bg-white/5 text-on-surface-variant rounded-full px-4 py-1.5 font-bold text-[13px] hover:bg-white/10 hover:text-on-surface transition-colors" onClick={() => onReject(itemId)}>Ignore</button>}
+        {onRemove && <button className="border border-error/50 bg-error/10 text-error rounded-full px-4 py-1.5 font-bold text-[13px] hover:bg-error/20 transition-colors" onClick={() => onRemove(itemId)}>Remove</button>}
       </div>
-    </Card>
+    </div>
   )
 }
 
@@ -64,18 +63,18 @@ export default function NetworkPage() {
   }
 
   return (
-    <div className="mx-auto" style={{ maxWidth: '800px' }}>
-      <div className="d-flex justify-content-between align-items-end mb-4 pb-2 border-bottom">
-        <h3 className="m-0" style={{ fontWeight: 700, color: 'var(--color-text-main)' }}>My Network</h3>
-        <div className="segmented-control" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--bg-body)' }}>
+    <div className="w-full max-w-3xl mx-auto py-lg px-margin-mobile relative z-10">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-md pb-sm border-b border-white/10">
+        <h3 className="font-headline-md font-bold text-on-surface m-0">My Network</h3>
+        <div className="flex bg-surface-container rounded-lg p-1 border border-white/10">
           <button 
-            className={`btn ${tab === 'pending' ? 'active' : ''}`}
+            className={`px-4 py-1.5 rounded-md font-body-sm transition-colors ${tab === 'pending' ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
             onClick={() => setTab('pending')} 
           >
             Invitations ({pending.length})
           </button>
           <button 
-            className={`btn ${tab === 'accepted' ? 'active' : ''}`}
+            className={`px-4 py-1.5 rounded-md font-body-sm transition-colors ${tab === 'accepted' ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
             onClick={() => setTab('accepted')} 
           >
             Connections ({accepted.length})
@@ -83,16 +82,16 @@ export default function NetworkPage() {
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-md">
         {tab === 'pending' ? (
           <div>
             {pending.length === 0 ? (
-              <Card className="text-center py-5" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-                <div style={{ marginBottom: '16px', color: 'var(--color-border)' }}>
+              <div className="glass-panel text-center py-5 border border-white/10 rounded-xl flex flex-col items-center">
+                <div className="text-on-surface-variant opacity-50 mb-4">
                   <CiMail size={48} />
                 </div>
-                <div style={{ color: 'var(--color-text-muted)', fontWeight: 500 }}>No pending invitations</div>
-              </Card>
+                <div className="text-on-surface font-body-sm font-medium">No pending invitations</div>
+              </div>
             ) : (
               pending.map(p => <UserRow key={p._id || p.id} user={p.senderId} itemId={p._id || p.id} onAccept={() => setStatus(p._id || p.id, 'accepted')} onReject={() => setStatus(p._id || p.id, 'rejected')} />)
             )}
@@ -100,12 +99,12 @@ export default function NetworkPage() {
         ) : (
           <div>
             {accepted.length === 0 ? (
-              <Card className="text-center py-5" style={{ border: '1px solid var(--color-border)', boxShadow: 'none', borderRadius: '12px' }}>
-                <div style={{ marginBottom: '16px', color: 'var(--color-border)' }}>
+              <div className="glass-panel text-center py-5 border border-white/10 rounded-xl flex flex-col items-center">
+                <div className="text-on-surface-variant opacity-50 mb-4">
                   <CiUser size={48} />
                 </div>
-                <div style={{ color: 'var(--color-text-muted)', fontWeight: 500 }}>You don't have any connections yet.</div>
-              </Card>
+                <div className="text-on-surface font-body-sm font-medium">You don't have any connections yet.</div>
+              </div>
             ) : (
               accepted.map(c => {
                 const isSender = String(c.senderId?._id || c.senderId?.id || c.senderId) === String(user?._id || user?.id);
