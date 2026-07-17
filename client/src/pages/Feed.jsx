@@ -59,7 +59,6 @@ export default function Feed() {
         </div>
 
         {posts.length === 0 && !loading ? (
-        {posts.length === 0 && !loading ? (
           <div className="card-minimal d-flex flex-column align-items-center justify-content-center text-center" style={{ padding: '48px 24px' }}>
             <div style={{ color: 'var(--color-text-muted)', marginBottom: '16px', opacity: 0.5 }}>
               <CiMonitor size={48} />
