@@ -167,7 +167,6 @@ export default function PostCard({ post, onLike, onDelete }) {
 
       {/* Comments Section */}
       {expanded && (
-      {expanded && (
         <div style={{ backgroundColor: 'var(--bg-body)', margin: '-24px', marginTop: '16px', padding: '24px', borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)', borderTop: '1px solid var(--color-border)' }}>
           <div className="d-flex gap-2 align-items-center mb-4">
             <input 
