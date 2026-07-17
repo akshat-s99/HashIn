@@ -26,7 +26,7 @@ export default function Landing() {
 {/* Hero Section */}
 <section className="text-center w-full max-w-4xl flex flex-col items-center gap-md mt-lg mb-xl">
 <h1 className="font-headline-lg text-headline-lg md:text-[72px] md:leading-[1.1] font-bold text-on-background tracking-tight">
-                Network for Builders.<br/ />Not Buzzwords.
+                Network for Builders.<br />Not Buzzwords.
             </h1>
 <p className="font-headline-md text-headline-md text-on-surface-variant max-w-2xl mt-sm">
                 HashIn is the professional platform built by engineers, for engineers.
